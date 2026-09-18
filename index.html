@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>προθεσμία</title>
+  <meta name="description" content="prothesmia: pomodoro and stuff" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Geist:wght@100;400;500;600;700&family=Geist+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700&family=Inter:wght@300&display=swap"
+  />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/dseg@0.46.0/css/dseg.css" />
+  <link rel="stylesheet" href="style.css?v=118" />
+</head>
+<body>
+  <div class="bg-layer" id="bg-layer" aria-hidden="true">
+    <img class="bg-image" id="bg-image" alt="" hidden />
+    <div class="bg-video-wrap" id="bg-video-wrap" hidden>
+      <div id="bg-video"></div>
+    </div>
+    <div class="bg-overlay" id="bg-overlay"></div>
+  </div>
+
+  <div class="bg-video-controls" id="bg-video-controls" hidden>
+    <button class="icon-btn small video-ctrl-btn tip-above" type="button" id="bg-video-mute" data-tip="unmute"></button>
+    <button class="icon-btn small video-ctrl-btn tip-above" type="button" id="bg-video-play" data-tip="pause"></button>
+    <input class="range-input bg-video-seek" type="range" id="bg-video-seek" min="0" max="100" value="0" step="0.5" />
+  </div>
+
+  <div class="ytmusic-card" id="ytmusic-card" hidden>
+    <div class="ytmusic-thumb" id="ytmusic-thumb"></div>
+    <div class="ytmusic-text">
+      <div class="ytmusic-title" id="ytmusic-title">youtube audio</div>
+      <div class="ytmusic-artist" id="ytmusic-artist"></div>
+      <input type="range" class="range-input ytmusic-seek" id="ytmusic-seek" min="0" max="100" value="0" step="0.1">
+      <div class="ytmusic-time" id="ytmusic-time">0:00 / 0:00</div>
+    </div>
+    <div class="ytmusic-controls">
+      <button class="icon-btn small tip-above ytmusic-sub-btn" type="button" id="ytmusic-prev" data-tip="prev">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+      </button>
+      <button class="icon-btn small ytmusic-play-btn tip-above" type="button" id="ytmusic-play" data-tip="pause"></button>
+      <button class="icon-btn small tip-above ytmusic-sub-btn" type="button" id="ytmusic-next" data-tip="next">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+      </button>
+    </div>
+    <button class="ytmusic-close" id="ytmusic-close" type="button" aria-label="close">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+
+  <div class="ytmusic-player-clip"><div id="ytmusic-player"></div></div>
+
+  <header class="header" id="header"></header>
+
+  <main class="main" id="view-focus">
+    <div class="tabs" id="tabs"></div>
+
+    <div class="timer-stage">
+      <div class="stage-gap"></div>
+      <div class="ring-wrap">
+        <svg width="360" height="360" viewBox="0 0 360 360" class="ring-svg">
+          <circle cx="180" cy="180" r="172" fill="none" stroke="#2e2e2e" stroke-width="3" />
+          <circle id="ring-progress" cx="180" cy="180" r="172" fill="none" stroke-width="3" stroke-linecap="round" />
+        </svg>
+        <div class="ring-center">
+          <div class="digits" id="digits">25:00</div>
+          <div class="session-label" id="session-label">focus</div>
+        </div>
+      </div>
+      <div class="stage-gap"></div>
+
+      <div class="controls">
+        <div class="control-unit">
+          <button class="btn-start" id="start-btn" type="button" aria-label="start"></button>
+        </div>
+        <div class="control-unit">
+          <button class="btn-reset" id="reset-btn" type="button" aria-label="reset"></button>
+          <span class="indicator-light reset-light"></span>
+        </div>
+      </div>
+      <div class="stage-gap"></div>
+    </div>
+  </main>
+
+  <div id="notes-widget" class="notes-widget" hidden>
+    <div class="notes-header" id="notes-header">
+      <span class="notes-title">notes</span>
+    </div>
+    <div class="notes-content" id="notes-content" contenteditable="true" spellcheck="false"></div>
+  </div>
+
+  <div id="settings-root"></div>
+
+  <div class="layout-edit-bar" id="layout-edit-bar" hidden>
+    <span>drag to move // scroll to resize</span>
+    <button id="layout-reset" type="button">reset</button>
+    <button id="layout-done" type="button">done</button>
+  </div>
+
+  <script src="shared.js?v=32"></script>
+  <script src="app.js?v=35"></script>
+</body>
+</html>
