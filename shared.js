@@ -1372,14 +1372,17 @@ function mountSettingsPanel() {
 
   function armPreviewSlider(el) {
     el.addEventListener("pointerdown", () => {
+      if (el.disabled) return;
       previewHeld = true;
       showPreview();
     });
     el.addEventListener("input", () => {
+      if (el.disabled) return;
       showPreview();
       if (!previewHeld) scheduleHidePreview();
     });
     el.addEventListener("change", () => {
+      if (el.disabled) return;
       previewHeld = false;
       scheduleHidePreview();
     });
