@@ -210,10 +210,21 @@
 
     updateDigits(secondsLeft);
     let labelText = mode.sessionLabel;
-    if (new Date().getHours() === 3) {
-      labelText += " ...go to sleep";
+    if (new Date().getHours() === 3 && !window.dismissedSleepMessage) {
+      labelText = "go to sleep";
     }
     sessionLabelEl.textContent = labelText;
+
+    if (!sessionLabelEl.hasAttribute("data-sleep-listener")) {
+      sessionLabelEl.setAttribute("data-sleep-listener", "true");
+      sessionLabelEl.addEventListener("click", () => {
+        if (sessionLabelEl.textContent === "go to sleep") {
+          window.dismissedSleepMessage = true;
+          renderStatic();
+        }
+      });
+      sessionLabelEl.style.cursor = "pointer";
+    }
 
     const isFresh = secondsLeft === totalSeconds();
     if (loadButtonProfile() === "retro") {
