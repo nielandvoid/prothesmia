@@ -886,7 +886,7 @@ body.btn-profile-retro .tabs {
   backdrop-filter: none;
 }
 
-body.btn-profile-retro .tab-btn {
+body.btn-profile-retro .control-unit .tab-btn {
   padding: 10px 22px;
   background-color: var(--retro-fill);
   background-image: radial-gradient(circle at 35% 25%, color-mix(in srgb, var(--fg) 5%, transparent), transparent 60%);
