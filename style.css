@@ -1635,3 +1635,57 @@ body.btn-profile-retro .digits::before {
     flex: 1;
   }
 }
+
+.onload-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 8, 8, 0.85);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.onload-modal {
+  background: var(--glass-fill);
+  border: 1px solid var(--border);
+  padding: 32px;
+  font-family: var(--font-sans);
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+  width: 100%;
+  max-width: 580px;
+  margin: 20px;
+}
+
+.onload-modal a {
+  color: var(--fg);
+  text-decoration: underline;
+  text-decoration-color: var(--border);
+  text-underline-offset: 4px;
+}
+
+.onload-modal a:hover {
+  text-decoration-color: var(--fg);
+}
+
+.onload-close {
+  margin-top: 32px;
+  background: transparent;
+  border: none;
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0;
+  display: block;
+  width: 100%;
+  text-align: right;
+}
+
+.onload-close:hover {
+  color: #fff;
+}

@@ -240,6 +240,28 @@
   buildTabs();
   renderStatic();
 
+  if (!localStorage.getItem("prothesmia:visited")) {
+    const overlay = document.createElement("div");
+    overlay.className = "onload-overlay";
+    overlay.innerHTML = `
+      <div class="onload-modal">
+        <div style="color: var(--fg);">// prothesmia</div>
+        <br>
+        <div>&gt; site data is stored in your browser's localStorage</div>
+        <div>&gt; notes widget <em>does</em> support basic markdown</div>
+        <div>&gt; video dominates image for background media; everything else in settings</div>
+        <div>&gt; <a href="https://github.com/nielandvoid/prothesmia" target="_blank" rel="noopener noreferrer">https://github.com/nielandvoid/prothesmia</a> // PRs welcome</div>
+        <button class="onload-close" type="button">[ close ]</button>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    overlay.querySelector(".onload-close").addEventListener("click", () => {
+      localStorage.setItem("prothesmia:visited", "true");
+      overlay.remove();
+    });
+  }
+
   startBtn.addEventListener("click", toggleRunning);
   resetBtn.addEventListener("click", reset);
 
