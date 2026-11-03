@@ -11,7 +11,7 @@ GlobalFonts.registerFromPath(font("geist-mono-400.woff"), "Geist Mono");
 GlobalFonts.registerFromPath(font("geist-mono-500.woff"), "Geist Mono Medium");
 
 const W = 1000;
-const H = 700;
+const H = 500;
 
 const color = {
   bg: "#1b1b1b",
@@ -109,9 +109,9 @@ export async function drawCard(countdown, m) {
     .filter(Boolean);
   const right = W - padX;
 
-  const ringSize = W * 0.46;
+  const ringSize = W * 0.29;
   const cx = rows.length ? padX + ringSize / 2 : W / 2;
-  const cy = (blockH + H - 60) / 2;
+  const cy = (blockH + H - 40) / 2;
   const radius = ringSize * 0.46;
 
   ctx.lineWidth = ringSize * 0.016;
@@ -133,15 +133,15 @@ export async function drawCard(countdown, m) {
   ctx.fillStyle = color.fg;
   fitFont(ctx, value, "Geist Mono Medium", ringSize * 0.34, ringSize * 0.7);
   ctx.textAlign = "center";
-  ctx.fillText(value, cx, cy - ringSize * 0.04);
+  ctx.fillText(value, cx, cy - 12);
 
   ctx.fillStyle = color.muted;
-  ctx.font = `${ringSize * 0.076}px "Geist"`;
-  tracked(ctx, unit, cx, cy + ringSize * 0.16, 1, "center");
+  ctx.font = '22px "Geist"';
+  tracked(ctx, unit, cx, cy + 48, 1, "center");
 
   if (rows.length) {
     const left = padX + ringSize + 40;
-    const rowH = 96;
+    const rowH = 68;
     const top = cy - (rowH * rows.length) / 2;
     const inset = 26;
 
