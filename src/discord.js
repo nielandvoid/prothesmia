@@ -3,6 +3,11 @@ const SUPPRESS_NOTIFICATIONS = 1 << 12;
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+function imageName(message) {
+  const url = message.embeds[0]?.image?.url;
+  return url ? new URL(url).pathname.split("/").pop() : null;
+}
+
 export function connect(token) {
   async function request(method, path, body) {
     for (let attempt = 0; attempt < 3; attempt++) {
@@ -43,7 +48,7 @@ export function connect(token) {
     return recent.find(
       (message) =>
         message.author.id === me.id &&
-        message.attachments.some((attachment) => attachment.filename === filename),
+        imageName(message) === filename,
     );
   }
 

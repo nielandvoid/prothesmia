@@ -54,6 +54,14 @@ export async function openDatabase({ url, authToken }) {
       return rows.map(toCountdown);
     },
 
+    async inChannel(guildId, channelId) {
+      const { rows } = await db.execute({
+        sql: `select ${FIELDS.join(", ")} from countdowns where guild_id = ? and channel_id = ? order by label`,
+        args: [guildId, channelId],
+      });
+      return rows.map(toCountdown);
+    },
+
     async save(c) {
       await db.execute({
         sql: `

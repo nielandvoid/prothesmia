@@ -12,8 +12,8 @@ GlobalFonts.registerFromPath(font("geist-mono-500.woff"), "Geist Mono Medium");
 
 const W = 1000;
 const DIMENSIONS = {
-  tall: { height: 700, ring: 0.46, rowH: 96 },
-  compact: { height: 500, ring: 0.29, rowH: 68 },
+  tall: { height: 700, ring: 0.43, rowH: 96, reserve: 90 },
+  compact: { height: 500, ring: 0.29, rowH: 68, reserve: 50 },
 };
 
 const color = {
@@ -56,7 +56,7 @@ const fieldRows = {
 };
 
 export async function drawCard(countdown, m) {
-  const { height: H, ring, rowH } = DIMENSIONS[countdown.dimensions] ?? DIMENSIONS.tall;
+  const { height: H, ring, rowH, reserve } = DIMENSIONS[countdown.dimensions] ?? DIMENSIONS.tall;
   const canvas = createCanvas(W, H);
   const ctx = canvas.getContext("2d");
   ctx.textBaseline = "middle";
@@ -114,8 +114,8 @@ export async function drawCard(countdown, m) {
   const right = W - padX;
 
   const ringSize = W * ring;
-  const cx = rows.length ? padX + ringSize / 2 : W / 2;
-  const cy = (blockH + H - 50) / 2;
+  const cx = rows.length ? padX + ringSize * 0.468 : W / 2;
+  const cy = (blockH + H - reserve) / 2;
   const radius = ringSize * 0.46;
 
   ctx.lineWidth = ringSize * 0.016;
@@ -144,7 +144,7 @@ export async function drawCard(countdown, m) {
   tracked(ctx, unit, cx, cy + ringSize * 0.16, 1, "center");
 
   if (rows.length) {
-    const left = padX + ringSize + 40;
+    const left = padX + ringSize * 0.936 + 52;
     const top = cy - (rowH * rows.length) / 2;
     const inset = 26;
 
@@ -170,7 +170,7 @@ export async function drawCard(countdown, m) {
 
   ctx.fillStyle = color.muted;
   ctx.font = '25px "Geist"';
-  tracked(ctx, "updates hourly // prothesmia.xyz", right, H - padBottom - 11, 0.5, "right");
+  tracked(ctx, "updates hourly // prothesmia.xyz", rows.length ? right : W - 31, H - 40, 0.5, "right");
 
   return canvas.encode("png");
 }

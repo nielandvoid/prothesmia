@@ -25,7 +25,7 @@ const STALE_AFTER = HOUR - 5 * 60000;
 
 const db = await openDatabase({ url: process.env.TURSO_URL, authToken: process.env.TURSO_TOKEN });
 const client = connect(process.env.DISCORD_TOKEN);
-const commands = createCommands({ db, client });
+const commands = createCommands({ db, client, lastRun: () => lastRun });
 
 let lastRun = 0;
 let running = false;
@@ -94,6 +94,10 @@ const server = createServer(async (req, res) => {
 
     const interaction = JSON.parse(body);
     if (interaction.type === 1) return send(res, 200, { type: 1 });
+    if (interaction.type === 4 && interaction.data?.name === "countdown") {
+      const choices = await commands.autocomplete(interaction).catch(() => []);
+      return send(res, 200, { type: 8, data: { choices } });
+    }
     if (interaction.type !== 2 || interaction.data?.name !== "countdown") return send(res, 400, {});
 
     const { ack, work } = commands.handle(interaction);
