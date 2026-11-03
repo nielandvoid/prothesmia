@@ -1,6 +1,6 @@
 import { createClient } from "@libsql/client/web";
 
-const FIELDS = ["id", "guild_id", "channel_id", "label", "date", "start", "tag", "time_zone", "fields", "thumbnail"];
+const FIELDS = ["id", "guild_id", "channel_id", "label", "date", "start", "tag", "time_zone", "fields", "thumbnail", "dimensions"];
 
 export async function openDatabase({ url, authToken }) {
   const db = createClient({ url, authToken });
@@ -21,6 +21,11 @@ export async function openDatabase({ url, authToken }) {
     )
   `);
 
+  const { rows: columns } = await db.execute("pragma table_info(countdowns)");
+  if (!columns.some((column) => column.name === "dimensions")) {
+    await db.execute("alter table countdowns add column dimensions text");
+  }
+
   const toCountdown = (row) => ({
     id: Number(row.id),
     guildId: row.guild_id,
@@ -32,6 +37,7 @@ export async function openDatabase({ url, authToken }) {
     timeZone: row.time_zone,
     fields: row.fields === null ? undefined : JSON.parse(row.fields),
     thumbnail: row.thumbnail ?? undefined,
+    dimensions: row.dimensions ?? undefined,
   });
 
   return {
@@ -51,15 +57,16 @@ export async function openDatabase({ url, authToken }) {
     async save(c) {
       await db.execute({
         sql: `
-          insert into countdowns (guild_id, channel_id, label, date, start, tag, time_zone, fields, thumbnail)
-          values (?, ?, ?, ?, ?, ?, ?, ?, ?)
+          insert into countdowns (guild_id, channel_id, label, date, start, tag, time_zone, fields, thumbnail, dimensions)
+          values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
           on conflict (channel_id, label) do update set
             date = excluded.date,
             start = excluded.start,
             tag = excluded.tag,
             time_zone = excluded.time_zone,
             fields = excluded.fields,
-            thumbnail = excluded.thumbnail
+            thumbnail = excluded.thumbnail,
+            dimensions = excluded.dimensions
         `,
         args: [
           c.guildId,
@@ -71,6 +78,7 @@ export async function openDatabase({ url, authToken }) {
           c.timeZone,
           c.fields === undefined ? null : JSON.stringify(c.fields),
           c.thumbnail ?? null,
+          c.dimensions ?? null,
         ],
       });
     },

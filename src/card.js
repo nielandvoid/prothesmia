@@ -11,7 +11,10 @@ GlobalFonts.registerFromPath(font("geist-mono-400.woff"), "Geist Mono");
 GlobalFonts.registerFromPath(font("geist-mono-500.woff"), "Geist Mono Medium");
 
 const W = 1000;
-const H = 700;
+const DIMENSIONS = {
+  tall: { height: 700, ring: 0.46, rowH: 96 },
+  compact: { height: 500, ring: 0.29, rowH: 68 },
+};
 
 const color = {
   bg: "#1b1b1b",
@@ -53,6 +56,7 @@ const fieldRows = {
 };
 
 export async function drawCard(countdown, m) {
+  const { height: H, ring, rowH } = DIMENSIONS[countdown.dimensions] ?? DIMENSIONS.tall;
   const canvas = createCanvas(W, H);
   const ctx = canvas.getContext("2d");
   ctx.textBaseline = "middle";
@@ -109,9 +113,9 @@ export async function drawCard(countdown, m) {
     .filter(Boolean);
   const right = W - padX;
 
-  const ringSize = W * 0.46;
+  const ringSize = W * ring;
   const cx = rows.length ? padX + ringSize / 2 : W / 2;
-  const cy = (blockH + H - 60) / 2;
+  const cy = (blockH + H - 50) / 2;
   const radius = ringSize * 0.46;
 
   ctx.lineWidth = ringSize * 0.016;
@@ -141,7 +145,6 @@ export async function drawCard(countdown, m) {
 
   if (rows.length) {
     const left = padX + ringSize + 40;
-    const rowH = 96;
     const top = cy - (rowH * rows.length) / 2;
     const inset = 26;
 

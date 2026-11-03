@@ -26,6 +26,13 @@ export const command = {
         option("tag", "small text in the top corner, none to hide it"),
         option("fields", "rows beside the ring: target, timeLeft, elapsed, or none"),
         option("thumbnail", "image url for the embed corner"),
+        {
+          ...option("dimensions", "card shape, tall by default"),
+          choices: [
+            { name: "tall", value: "tall" },
+            { name: "compact", value: "compact" },
+          ],
+        },
       ],
     },
     {
@@ -85,6 +92,7 @@ function build(values, interaction) {
       timeZone,
       fields,
       thumbnail,
+      dimensions: values.dimensions,
     },
   };
 }
