@@ -1,7 +1,7 @@
 import { readFile, mkdir, writeFile } from "node:fs/promises";
 import { measure } from "./time.js";
 import { drawCard } from "./card.js";
-import { buildEmbed } from "./embed.js";
+import { refreshOne } from "./refresh.js";
 import { connect } from "./discord.js";
 
 const dry = process.argv.includes("--dry");
@@ -29,7 +29,6 @@ for (const countdown of countdowns) {
   try {
     const m = measure(countdown, now);
     const png = await drawCard(countdown, m);
-    const embed = buildEmbed(countdown, now);
 
     if (dry) {
       const dir = new URL("../out/", import.meta.url);
@@ -42,7 +41,7 @@ for (const countdown of countdowns) {
     if (!countdown.channelId || countdown.channelId.startsWith("REPLACE")) {
       throw new Error("channelId is not set in countdowns.json");
     }
-    const result = await client.publish({ channelId: countdown.channelId, embed, png });
+    const result = await refreshOne(client, countdown, now);
     console.log(`${countdown.id}: ${result.action} message ${result.id}`);
   } catch (error) {
     failed = true;

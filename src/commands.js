@@ -1,5 +1,6 @@
 import { validZone, parseInstant } from "./zone.js";
 import { refreshOne } from "./refresh.js";
+import { cardName } from "./embed.js";
 
 const MANAGE_GUILD = 1n << 5n;
 const EPHEMERAL = 64;
@@ -104,7 +105,7 @@ export function createCommands({ db, client }) {
       const label = values.label.trim();
       const removed = await db.remove(interaction.guild_id, interaction.channel_id, label);
       if (!removed) return `no countdown called **${label}** in this channel.`;
-      await client.remove({ channelId: interaction.channel_id, title: label }).catch(() => {});
+      await client.remove({ channelId: interaction.channel_id, filename: cardName(label) }).catch(() => {});
       return `removed **${label}**.`;
     }
 

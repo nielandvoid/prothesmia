@@ -1,10 +1,15 @@
 import { measure } from "./time.js";
 import { drawCard } from "./card.js";
-import { buildEmbed } from "./embed.js";
+import { buildEmbed, cardName } from "./embed.js";
 
 export async function refreshOne(client, countdown, now = new Date()) {
   const png = await drawCard(countdown, measure(countdown, now));
-  return client.publish({ channelId: countdown.channelId, embed: buildEmbed(countdown, now), png });
+  return client.publish({
+    channelId: countdown.channelId,
+    embed: buildEmbed(countdown, now),
+    png,
+    filename: cardName(countdown.label),
+  });
 }
 
 export async function refreshAll(db, client, now = new Date()) {

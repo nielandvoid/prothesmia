@@ -1,5 +1,3 @@
-import { FILENAME, AUTHOR } from "./embed.js";
-
 const API = "https://discord.com/api/v10";
 const SUPPRESS_NOTIFICATIONS = 1 << 12;
 
@@ -29,42 +27,41 @@ export function connect(token) {
     throw new Error(`${method} ${path}: still rate limited after retries`);
   }
 
-  function form(payload, png) {
+  function form(payload, png, filename) {
     const data = new FormData();
     data.append(
       "payload_json",
-      JSON.stringify({ ...payload, attachments: [{ id: 0, filename: FILENAME }] }),
+      JSON.stringify({ ...payload, attachments: [{ id: 0, filename }] }),
     );
-    data.append("files[0]", new Blob([png], { type: "image/png" }), FILENAME);
+    data.append("files[0]", new Blob([png], { type: "image/png" }), filename);
     return data;
   }
 
-  async function locate(channelId, title) {
+  async function locate(channelId, filename) {
     const me = await request("GET", "/users/@me");
     const recent = await request("GET", `/channels/${channelId}/messages?limit=50`);
     return recent.find(
       (message) =>
         message.author.id === me.id &&
-        message.embeds[0]?.title === title &&
-        message.embeds[0]?.author?.name === AUTHOR,
+        message.attachments.some((attachment) => attachment.filename === filename),
     );
   }
 
-  async function remove({ channelId, title }) {
-    const existing = await locate(channelId, title);
+  async function remove({ channelId, filename }) {
+    const existing = await locate(channelId, filename);
     if (!existing) return false;
     await request("DELETE", `/channels/${channelId}/messages/${existing.id}`);
     return true;
   }
 
-  async function publish({ channelId, embed, png }) {
-    const existing = await locate(channelId, embed.title);
+  async function publish({ channelId, embed, png, filename }) {
+    const existing = await locate(channelId, filename);
 
     if (existing) {
       await request(
         "PATCH",
         `/channels/${channelId}/messages/${existing.id}`,
-        form({ embeds: [embed] }, png),
+        form({ embeds: [embed] }, png, filename),
       );
       return { action: "edited", id: existing.id };
     }
@@ -72,7 +69,7 @@ export function connect(token) {
     const created = await request(
       "POST",
       `/channels/${channelId}/messages`,
-      form({ embeds: [embed], flags: SUPPRESS_NOTIFICATIONS, allowed_mentions: { parse: [] } }, png),
+      form({ embeds: [embed], flags: SUPPRESS_NOTIFICATIONS, allowed_mentions: { parse: [] } }, png, filename),
     );
     return { action: "posted", id: created.id };
   }
