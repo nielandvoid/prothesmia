@@ -1,0 +1,12 @@
+[
+  {
+    "id": "jee-main-2027",
+    "label": "JEE Main 2027",
+    "tag": "JEE Main 2027",
+    "date": "2027-01-04T09:00:00+05:30",
+    "start": "2026-04-01T00:00:00+05:30",
+    "timeZone": "Asia/Kolkata",
+    "fields": ["target", "timeLeft", "elapsed"],
+    "channelId": "REPLACE_WITH_CHANNEL_ID"
+  }
+]
