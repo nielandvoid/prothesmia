@@ -167,7 +167,7 @@ export async function drawCard(countdown, m) {
 
   ctx.fillStyle = color.muted;
   ctx.font = '25px "Geist"';
-  tracked(ctx, "prothesmia.xyz", right, H - padBottom - 11, 0.5, "right");
+  tracked(ctx, "updates hourly // prothesmia.xyz", right, H - padBottom - 11, 0.5, "right");
 
   return canvas.encode("png");
 }

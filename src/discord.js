@@ -1,4 +1,4 @@
-import { FILENAME, FOOTER_TEXT } from "./embed.js";
+import { FILENAME, AUTHOR } from "./embed.js";
 
 const API = "https://discord.com/api/v10";
 const SUPPRESS_NOTIFICATIONS = 1 << 12;
@@ -46,7 +46,7 @@ export function connect(token) {
       (message) =>
         message.author.id === me.id &&
         message.embeds[0]?.title === title &&
-        message.embeds[0]?.footer?.text === FOOTER_TEXT,
+        message.embeds[0]?.author?.name === AUTHOR,
     );
   }
 
