@@ -783,14 +783,18 @@ code {
 
 @media (max-width: 600px) {
   .header {
-    padding-left: 20px;
+    padding-left: 24px;
+  }
+
+  .wordmark {
+    transform: none;
   }
 }
 
 @media (max-width: 520px) {
   .actions {
-    grid-template-columns: repeat(3, max-content);
-    row-gap: 12px;
+    grid-template-columns: repeat(4, max-content);
+    gap: 12px 8px;
   }
 
   .btn.primary {
@@ -798,12 +802,26 @@ code {
     justify-self: start;
   }
 
+  .btn:not(.primary) {
+    padding: 0 12px;
+  }
+
   .perms {
     margin-top: -12px;
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 340px) {
+  .actions {
+    column-gap: 6px;
+  }
+
+  .btn:not(.primary) {
+    padding: 0 9px;
+  }
+}
+
+@media (max-width: 359px) {
   .klepsydra-name {
     display: none;
   }
