@@ -1,6 +1,9 @@
 import { createClient } from "@libsql/client/web";
 
-const FIELDS = ["id", "guild_id", "channel_id", "label", "date", "start", "tag", "time_zone", "fields", "thumbnail", "dimensions"];
+const FIELDS = [
+  "id", "guild_id", "channel_id", "label", "date", "start", "tag", "time_zone",
+  "fields", "thumbnail", "dimensions", "interval_hours", "refreshed_at", "ring_style",
+];
 
 export async function openDatabase({ url, authToken }) {
   const db = createClient({ url, authToken });
@@ -22,8 +25,10 @@ export async function openDatabase({ url, authToken }) {
   `);
 
   const { rows: columns } = await db.execute("pragma table_info(countdowns)");
-  if (!columns.some((column) => column.name === "dimensions")) {
-    await db.execute("alter table countdowns add column dimensions text");
+  for (const [name, type] of [["dimensions", "text"], ["interval_hours", "integer"], ["refreshed_at", "text"], ["ring_style", "text"]]) {
+    if (!columns.some((column) => column.name === name)) {
+      await db.execute(`alter table countdowns add column ${name} ${type}`);
+    }
   }
 
   const toCountdown = (row) => ({
@@ -38,6 +43,9 @@ export async function openDatabase({ url, authToken }) {
     fields: row.fields === null ? undefined : JSON.parse(row.fields),
     thumbnail: row.thumbnail ?? undefined,
     dimensions: row.dimensions ?? undefined,
+    intervalHours: row.interval_hours === null ? undefined : Number(row.interval_hours),
+    refreshedAt: row.refreshed_at ?? undefined,
+    ringStyle: row.ring_style ?? undefined,
   });
 
   return {
@@ -65,8 +73,8 @@ export async function openDatabase({ url, authToken }) {
     async save(c) {
       await db.execute({
         sql: `
-          insert into countdowns (guild_id, channel_id, label, date, start, tag, time_zone, fields, thumbnail, dimensions)
-          values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          insert into countdowns (guild_id, channel_id, label, date, start, tag, time_zone, fields, thumbnail, dimensions, interval_hours, ring_style)
+          values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
           on conflict (channel_id, label) do update set
             date = excluded.date,
             start = excluded.start,
@@ -74,7 +82,9 @@ export async function openDatabase({ url, authToken }) {
             time_zone = excluded.time_zone,
             fields = excluded.fields,
             thumbnail = excluded.thumbnail,
-            dimensions = excluded.dimensions
+            dimensions = excluded.dimensions,
+            interval_hours = excluded.interval_hours,
+            ring_style = excluded.ring_style
         `,
         args: [
           c.guildId,
@@ -87,7 +97,16 @@ export async function openDatabase({ url, authToken }) {
           c.fields === undefined ? null : JSON.stringify(c.fields),
           c.thumbnail ?? null,
           c.dimensions ?? null,
+          c.intervalHours ?? null,
+          c.ringStyle ?? null,
         ],
+      });
+    },
+
+    async markRefreshed(channelId, label, at) {
+      await db.execute({
+        sql: "update countdowns set refreshed_at = ? where channel_id = ? and label = ?",
+        args: [at.toISOString(), channelId, label],
       });
     },
 

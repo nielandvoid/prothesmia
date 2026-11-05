@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node --env-file-if-exists=.env src/server.js",
     "register": "node --env-file-if-exists=.env src/register.js",
-    "dry": "node --env-file-if-exists=.env src/index.js --dry"
+    "preview": "node src/preview.js"
   },
   "engines": {
     "node": ">=22.9"

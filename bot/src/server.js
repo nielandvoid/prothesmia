@@ -2,7 +2,7 @@ import { createServer } from "node:http";
 import { createPublicKey, verify } from "node:crypto";
 import { openDatabase } from "./db.js";
 import { connect } from "./discord.js";
-import { createCommands } from "./commands.js";
+import { createCommands, helpText } from "./commands.js";
 import { refreshAll } from "./refresh.js";
 
 const required = ["DISCORD_TOKEN", "DISCORD_APP_ID", "DISCORD_PUBLIC_KEY", "TURSO_URL", "TURSO_TOKEN"];
@@ -25,7 +25,7 @@ const STALE_AFTER = HOUR - 5 * 60000;
 
 const db = await openDatabase({ url: process.env.TURSO_URL, authToken: process.env.TURSO_TOKEN });
 const client = connect(process.env.DISCORD_TOKEN);
-const commands = createCommands({ db, client, lastRun: () => lastRun });
+const commands = createCommands({ db, client });
 
 let lastRun = 0;
 let running = false;
@@ -97,6 +97,9 @@ const server = createServer(async (req, res) => {
     if (interaction.type === 4 && interaction.data?.name === "countdown") {
       const choices = await commands.autocomplete(interaction).catch(() => []);
       return send(res, 200, { type: 8, data: { choices } });
+    }
+    if (interaction.type === 2 && interaction.data?.name === "help") {
+      return send(res, 200, { type: 4, data: { flags: 64, content: helpText, allowed_mentions: { parse: [] } } });
     }
     if (interaction.type !== 2 || interaction.data?.name !== "countdown") return send(res, 400, {});
 

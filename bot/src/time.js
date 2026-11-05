@@ -2,6 +2,11 @@ const DAY = 86400000;
 const HOUR = 3600000;
 const MINUTE = 60000;
 
+export const MIN_INTERVAL_HOURS = 1;
+export const MAX_INTERVAL_HOURS = 24;
+
+export const intervalOf = (countdown) => countdown.intervalHours ?? MIN_INTERVAL_HOURS;
+
 export function measure(countdown, now) {
   const target = new Date(countdown.date);
   const left = Math.max(0, target - now);

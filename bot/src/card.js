@@ -1,6 +1,7 @@
 import { createCanvas, GlobalFonts } from "@napi-rs/canvas";
 import { fileURLToPath } from "node:url";
-import { headline, timeLeft, dateText } from "./time.js";
+import { headline, timeLeft, dateText, intervalOf } from "./time.js";
+import { ringPaint } from "./ring.js";
 
 const font = (file) => fileURLToPath(new URL(`../fonts/${file}`, import.meta.url));
 
@@ -48,6 +49,12 @@ function fitFont(ctx, text, family, size, maxWidth) {
 }
 
 const DEFAULT_FIELDS = ["target", "timeLeft", "elapsed"];
+
+function cadenceText(hours) {
+  if (hours === 1) return "updates hourly";
+  if (hours === 24) return "updates daily";
+  return `updates every ${hours}h`;
+}
 
 const fieldRows = {
   target: (countdown, m) => ["target", dateText(m, countdown.timeZone)],
@@ -126,7 +133,7 @@ export async function drawCard(countdown, m) {
 
   const fill = m.elapsed ?? 1;
   if (fill > 0) {
-    ctx.strokeStyle = color.fg;
+    ctx.strokeStyle = ringPaint(ctx, countdown.ringStyle, cx, cy, fill) ?? color.fg;
     ctx.lineCap = "round";
     ctx.beginPath();
     ctx.arc(cx, cy, radius, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * fill);
@@ -169,8 +176,8 @@ export async function drawCard(countdown, m) {
   }
 
   ctx.fillStyle = color.muted;
-  ctx.font = '25px "Geist"';
-  tracked(ctx, "updates hourly // prothesmia.xyz", rows.length ? right : W - 31, H - 40, 0.5, "right");
+  ctx.font = '16px "Geist"';
+  tracked(ctx, cadenceText(intervalOf(countdown)), right, H - 40, 0.5, "right");
 
   return canvas.encode("png");
 }

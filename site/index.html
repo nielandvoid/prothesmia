@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>προθεσμία</title>
+  <meta name="description" content="a dumb-simple discord bot to embed countdowns for events / exams in read-only discord channels. embeds are dynamic - 1h (min) to 24h.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://prothesmia.xyz/">
+  <meta property="og:title" content="προθεσμία">
+  <meta property="og:description" content="a dumb-simple discord bot to embed countdowns for events / exams in read-only discord channels. embeds are dynamic - 1h (min) to 24h.">
+  <meta property="og:image" content="https://prothesmia.xyz/prothesmia.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="προθεσμία">
+  <meta name="twitter:description" content="a dumb-simple discord bot to embed countdowns for events / exams in read-only discord channels. embeds are dynamic - 1h (min) to 24h.">
+  <meta name="twitter:image" content="https://prothesmia.xyz/prothesmia.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@200;300;400;500&display=swap">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/svg+xml" sizes="any" href="favicon.svg">
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/32x32.svg">
+  <link rel="apple-touch-icon" href="assets/180x180.png">
+  <link rel="manifest" href="site.webmanifest">
+</head>
+<body>
+  <header class="header">
+    <a class="wordmark" href="/"><span class="dot"></span>προθεσμία</a>
+    <nav class="headerlinks">
+      <a class="icon-btn" href="https://github.com/nielandvoid/prothesmia" target="_blank" rel="noopener noreferrer" data-tip="src" aria-label="src">
+        <svg width="22" height="22" viewBox="0 0 128 128" fill="currentColor"><path d="M56.7937 84.9688C44.4187 83.4688 35.7 74.5625 35.7 63.0313C35.7 58.3438 37.3875 53.2813 40.2 49.9063C38.9812 46.8125 39.1687 40.25 40.575 37.5313C44.325 37.0625 49.3875 39.0313 52.3875 41.75C55.95 40.625 59.7 40.0625 64.2937 40.0625C68.8875 40.0625 72.6375 40.625 76.0125 41.6563C78.9187 39.0313 84.075 37.0625 87.825 37.5313C89.1375 40.0625 89.325 46.625 88.1062 49.8125C91.1062 53.375 92.7 58.1563 92.7 63.0313C92.7 74.5625 83.9812 83.2813 71.4187 84.875C74.6062 86.9375 76.7625 91.4375 76.7625 96.5938L76.7625 106.344C76.7625 109.156 79.1062 110.75 81.9187 109.625C98.8875 103.156 112.2 86.1875 112.2 65.1875C112.2 38.6563 90.6375 17 64.1062 17C37.575 17 16.2 38.6562 16.2 65.1875C16.2 86 29.4187 103.25 47.2312 109.719C49.7625 110.656 52.2 108.969 52.2 106.438L52.2 98.9375C50.8875 99.5 49.2 99.875 47.7 99.875C41.5125 99.875 37.8562 96.5 35.2312 90.2188C34.2 87.6875 33.075 86.1875 30.9187 85.9063C29.7937 85.8125 29.4187 85.3438 29.4187 84.7813C29.4187 83.6563 31.2937 82.8125 33.1687 82.8125C35.8875 82.8125 38.2312 84.5 40.6687 87.9688C42.5437 90.6875 44.5125 91.9063 46.8562 91.9063C49.2 91.9063 50.7 91.0625 52.8562 88.9063C54.45 87.3125 55.6687 85.9063 56.7937 84.9688Z"/></svg>
+      </a>
+    </nav>
+  </header>
+  <a class="icon-btn klepsydra-link" href="https://klepsydra.xyz" target="_blank" rel="noopener noreferrer" data-tip="klepsydra">
+    <span class="dot"></span>
+    <span class="klepsydra-name">κλεψύδρα</span>
+  </a>
+
+  <main class="page">
+    <section class="intro">
+      <h1>simple<br>countdown embeds</h1>
+      <p>a dumb-simple discord bot to embed countdowns for events / exams in read-only discord channels. embeds are dynamic - 1h (min) to 24h.</p>
+      <div class="actions">
+        <a class="btn primary" href="https://discord.com/oauth2/authorize?client_id=1567004871859904724&scope=bot%20applications.commands&permissions=117760" target="_blank" rel="noopener noreferrer">add to discord</a>
+        <a class="btn" href="#preview">preview</a>
+        <a class="btn" href="#setup">setup</a>
+        <a class="btn" href="#commands">commands</a>
+        <a class="btn" href="https://github.com/nielandvoid/prothesmia" target="_blank" rel="noopener noreferrer">src</a>
+        <ul class="perms">
+          <li><code>view channels</code></li>
+          <li><code>send messages</code></li>
+          <li><code>embed links</code></li>
+          <li><code>attach files</code></li>
+          <li><code>read message history</code></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="preview" id="preview" aria-label="example card">
+      <div class="pane-tag">preview</div>
+      <div class="switches">
+        <div class="switch-row">
+          <button class="switch is-active" type="button" data-group="size" data-value="tall">tall</button>
+          <button class="switch" type="button" data-group="size" data-value="compact">compact</button>
+        </div>
+        <div class="switch-row">
+          <button class="switch is-active" type="button" data-group="fields" data-value="fields">w/ fields</button>
+          <button class="switch" type="button" data-group="fields" data-value="plain">w/o fields</button>
+        </div>
+        <div class="switch-row">
+          <button class="switch is-active" type="button" data-group="interval" data-value="1">1h</button>
+          <button class="switch" type="button" data-group="interval" data-value="6">6h</button>
+          <button class="switch" type="button" data-group="interval" data-value="24">24h</button>
+        </div>
+        <div class="switch-row">
+          <button class="switch is-active" type="button" data-group="ring" data-value="default">default</button>
+          <button class="switch" type="button" data-group="ring" data-value="pride">pride</button>
+          <button class="switch" type="button" data-group="ring" data-value="trans">trans</button>
+        </div>
+      </div>
+      <div class="preview-stage">
+        <div class="preview-frame">
+          <div class="card" id="card" role="img" aria-label="a countdown card showing 58 days left, with the target date and time left beside the ring">
+            <div class="card-wmark"></div>
+            <div class="card-dot"></div>
+            <div class="card-name">προθεσμία</div>
+            <div class="card-tag">JEE Main 2027</div>
+            <svg class="card-ring" viewBox="-215 -215 430 430" aria-hidden="true">
+              <defs>
+                <mask id="ring-reveal" maskUnits="userSpaceOnUse" x="-215" y="-215" width="430" height="430">
+                  <circle class="ring-reveal" r="197.8" pathLength="1" transform="rotate(-90)" />
+                </mask>
+              </defs>
+              <circle class="ring-track" r="197.8" />
+              <g mask="url(#ring-reveal)">
+                <circle class="ring-fill" r="197.8" />
+                <g class="ring-paint"></g>
+              </g>
+              <text class="ring-value" y="-17.2">58</text>
+              <text class="ring-unit" y="68.8">days left</text>
+            </svg>
+            <div class="card-table">
+              <div><span>target</span><span>01 jan 2027</span></div>
+              <div><span>time left</span><span>58d 20h</span></div>
+              <div><span>elapsed</span><span>62%</span></div>
+            </div>
+            <div class="card-foot">updates hourly</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="block" id="setup">
+      <div class="pane-tag">setup</div>
+      <div class="steps">
+        <p>invite the bot to your server</p>
+        <p>in the channel you want, use <code>/countdown set</code> to set a countdown with your desired config</p>
+        <p>leave it. the embed edits itself on the set interval</p>
+      </div>
+    </section>
+
+    <section class="block" id="commands">
+      <h2 class="block-tag">commands</h2>
+      <ul class="rows">
+        <li><code>/countdown set</code><span>post or replace a countdown in this channel</span></li>
+        <li><code>/countdown configure</code><span>change settings on one that already exists</span></li>
+        <li><code>/countdown list</code><span>show every countdown in the server, with its timers</span></li>
+        <li><code>/countdown remove</code><span>delete a countdown and its card</span></li>
+      </ul>
+    </section>
+
+    <section class="block" id="config">
+      <h2 class="block-tag">config</h2>
+      <ul class="rows">
+        <li><code>label</code><span>the title, for example <code>JEE Main 2027</code></span></li>
+        <li><code>deadline</code><span>written like <code>2027-01-04 09:00</code></span></li>
+        <li><code>timezone</code><span>an IANA name such as <code>Asia/Kolkata</code>; defaults to <code>UTC</code></span></li>
+        <li><code>start</code><span>when the ring starts filling, a full ring if left out</span></li>
+        <li><code>tag</code><span>small text in the top corner, <code>none</code> to hide</span></li>
+        <li><code>fields</code><span>beside the ring: <code>target</code>, <code>timeLeft</code>, <code>elapsed</code>, or <code>none</code> for nothing</span></li>
+        <li><code>thumbnail</code><span>an image url for the top-right corner / thumbnail of the embed</span></li>
+        <li><code>dimensions</code><span><code>tall</code> by default, or <code>compact</code></span></li>
+        <li><code>ring</code><span><code>default</code> / <code>pride</code> / <code>trans</code></span></li>
+        <li><code>interval</code><span>hours between updates, <code>1</code> to <code>24</code>; defaults to <code>1</code></span></li>
+      </ul>
+    </section>
+
+    <section class="block" id="notes">
+      <h2 class="block-tag">notes</h2>
+      <p class="notes">
+        commands require <code>manage server</code> permission.<br>
+        the invite requests:<br>
+        - <code>view channels</code><br>
+        - <code>send messages</code><br>
+        - <code>embed links</code><br>
+        - <code>attach files</code><br>
+        - <code>read message history</code><br>
+        the channel can stay read-only. the bot only needs to post in it.<br>
+        several countdowns can share a channel.<br>
+        uses no privileged intents.
+      </p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>προθεσμία</span>
+    <nav>
+      <a href="https://nielandvoid.com" target="_blank" rel="noopener noreferrer">niel</a>
+      <a href="https://github.com/nielandvoid/prothesmia" target="_blank" rel="noopener noreferrer">github</a>
+      <a href="https://klepsydra.xyz" target="_blank" rel="noopener noreferrer">κλεψύδρα</a>
+    </nav>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

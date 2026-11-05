@@ -1,6 +1,8 @@
 import { validZone, parseInstant } from "./zone.js";
 import { refreshOne } from "./refresh.js";
 import { cardName } from "./embed.js";
+import { MIN_INTERVAL_HOURS, MAX_INTERVAL_HOURS, intervalOf } from "./time.js";
+import { RING_STYLES } from "./ring.js";
 
 const MANAGE_GUILD = 1n << 5n;
 const EPHEMERAL = 64;
@@ -10,7 +12,7 @@ const option = (name, description, required = false) => ({ type: 3, name, descri
 
 const settings = (editing) => [
   option("deadline", editing ? "new deadline, like 2027-01-04 09:00" : "deadline as 2027-01-04 09:00", !editing),
-  option("timezone", "iana zone like Asia/Kolkata, defaults to UTC"),
+  option("timezone", "IANA zone like Asia/Kolkata, defaults to UTC"),
   option("start", "when the ring starts filling, none to clear"),
   option("tag", "small text in the top corner, none to hide it, default for the label"),
   option("fields", "rows beside the ring: target, timeLeft, elapsed, none or default"),
@@ -22,13 +24,26 @@ const settings = (editing) => [
       { name: "compact", value: "compact" },
     ],
   },
+  {
+    ...option("ring", "color of the progress ring, default is white"),
+    choices: [
+      { name: "default (white)", value: "default" },
+      ...Object.keys(RING_STYLES).map((name) => ({ name, value: name })),
+    ],
+  },
+  {
+    ...option("interval",`hours between updates, ${MIN_INTERVAL_HOURS} to ${MAX_INTERVAL_HOURS}, defaults to ${MIN_INTERVAL_HOURS}`),
+    type: 4,
+    min_value: MIN_INTERVAL_HOURS,
+    max_value: MAX_INTERVAL_HOURS,
+  },
 ];
 
 const picker = { ...option("label", "specify title if more than one countdown"), autocomplete: true };
 
 export const command = {
   name: "countdown",
-  description: "a countdown embed; updates itself every hour",
+  description: "a countdown embed; updates itself every 1 to 24 hours",
   default_member_permissions: String(MANAGE_GUILD),
   dm_permission: false,
   options: [
@@ -58,6 +73,38 @@ export const command = {
     },
   ],
 };
+
+export const helpCommand = {
+  name: "help",
+  description: "how the countdown commands and settings work",
+  dm_permission: false,
+};
+
+export const helpText = [
+  "**/countdown** needs the manage server permission. each countdown is one embed, edited on a schedule.",
+  "",
+  "`/countdown set` post or replace a countdown in this channel",
+  "`/countdown configure` change settings on one that already exists",
+  "`/countdown list` show every countdown in the server, with its timers",
+  "`/countdown remove` delete a countdown and its card",
+  "",
+  "**config**",
+  "`label` the title, for example JEE Main 2027",
+  "`deadline` written like 2027-01-04 09:00",
+  "`timezone` an IANA name such as Asia/Kolkata; defaults to UTC",
+  "`start` when the ring starts filling, a full ring if left out",
+  "`tag` small text in the top-right corner, none to hide",
+  "`fields` beside the ring: target, timeLeft, elapsed, or none for nothing",
+  "`thumbnail` an image url for the top-right corner / thumbnail of the embed",
+  "`dimensions` tall by default, or compact",
+  "`ring` default / pride / trans",
+  `\`interval\` hours between updates, ${MIN_INTERVAL_HOURS} to ${MAX_INTERVAL_HOURS}; defaults to ${MIN_INTERVAL_HOURS}`,
+  "",
+  "several countdowns can share a channel.",
+  "",
+  "prothesmia.xyz",
+  "src: <https://github.com/nielandvoid/prothesmia>",
+].join("\n");
 
 function parseCommand(interaction) {
   const sub = interaction.data.options[0];
@@ -93,6 +140,15 @@ function build(values, interaction) {
     thumbnail = values.thumbnail;
   }
 
+  let intervalHours;
+  if (values.interval !== undefined) {
+    const valid = Number.isInteger(values.interval) && values.interval >= MIN_INTERVAL_HOURS && values.interval <= MAX_INTERVAL_HOURS;
+    if (!valid) return { error: `interval has to be a whole number of hours from ${MIN_INTERVAL_HOURS} to ${MAX_INTERVAL_HOURS}.` };
+    intervalHours = values.interval;
+  }
+
+  const ringStyle = Object.hasOwn(RING_STYLES, values.ring) ? values.ring : undefined;
+
   const rawTag = values.tag?.toLowerCase();
   const tag = values.tag === undefined || rawTag === "default" ? undefined : rawTag === "none" ? "" : values.tag;
 
@@ -108,6 +164,8 @@ function build(values, interaction) {
       fields,
       thumbnail,
       dimensions: values.dimensions,
+      intervalHours,
+      ringStyle,
     },
   };
 }
@@ -119,31 +177,36 @@ function asInput(row) {
   if (row.fields !== undefined) input.fields = row.fields.length ? row.fields.join(", ") : "none";
   if (row.thumbnail) input.thumbnail = row.thumbnail;
   if (row.dimensions) input.dimensions = row.dimensions;
+  if (row.intervalHours) input.interval = row.intervalHours;
+  if (row.ringStyle) input.ring = row.ringStyle;
   return input;
 }
 
-const HOUR_SECONDS = 3300;
+const HOUR = 3600000;
+
+const cadence = (hours) => (hours === 1 ? "every hour" : `every ${hours} hours`);
 
 const stamp = (date, style) => `<t:${Math.floor(new Date(date) / 1000)}:${style}>`;
 
-function describe(row, lastRun) {
+function describe(row) {
   const tag = row.tag === undefined ? "the label" : row.tag === "" ? "hidden" : row.tag;
   const fields = row.fields === undefined ? "all" : row.fields.length ? row.fields.join(", ") : "none";
-  const refreshed = lastRun
-    ? `last refresh <t:${Math.floor(lastRun / 1000)}:R>, next <t:${Math.floor(lastRun / 1000) + HOUR_SECONDS}:R>`
-    : "first refresh pending";
+  const hours = intervalOf(row);
+  const refreshed = row.refreshedAt
+    ? `every ${hours}h, last refresh ${stamp(row.refreshedAt, "R")}, next ${stamp(new Date(row.refreshedAt).getTime() + hours * HOUR, "R")}`
+    : `every ${hours}h, first refresh pending`;
 
   return [
     `**${row.label}** in <#${row.channelId}>`,
     `deadline ${stamp(row.date, "f")}, ${stamp(row.date, "R")}`,
     `time zone ${row.timeZone}, start ${row.start ? stamp(row.start, "d") : "none"}`,
-    `tag ${tag}, fields ${fields}, dimensions ${row.dimensions ?? "tall"}`,
+    `tag ${tag}, fields ${fields}, dimensions ${row.dimensions ?? "tall"}, ring ${row.ringStyle ?? "default"}`,
     `thumbnail ${row.thumbnail ?? "none"}`,
     refreshed,
   ].join("\n");
 }
 
-export function createCommands({ db, client, lastRun = () => 0 }) {
+export function createCommands({ db, client }) {
   async function target(interaction, label) {
     const rows = await db.inChannel(interaction.guild_id, interaction.channel_id);
     if (!rows.length) return { error: "no countdowns in this channel. try `/countdown set`." };
@@ -165,8 +228,8 @@ export function createCommands({ db, client, lastRun = () => 0 }) {
       const { countdown, error } = build(values, interaction);
       if (error) return error;
       await db.save(countdown);
-      const result = await refreshOne(client, countdown);
-      return `${result.action} **${countdown.label}** in <#${countdown.channelId}>. it refreshes every hour.`;
+      const result = await refreshOne(db, client, countdown);
+      return `${result.action} **${countdown.label}** in <#${countdown.channelId}>. it refreshes ${cadence(intervalOf(countdown))}.`;
     }
 
     if (name === "configure") {
@@ -177,7 +240,7 @@ export function createCommands({ db, client, lastRun = () => 0 }) {
       const { countdown, error } = build({ ...asInput(found.row), ...changes }, interaction);
       if (error) return error;
       await db.save(countdown);
-      await refreshOne(client, countdown);
+      await refreshOne(db, client, countdown);
       return `updated **${countdown.label}**.`;
     }
 
@@ -195,7 +258,7 @@ export function createCommands({ db, client, lastRun = () => 0 }) {
     const rows = wanted ? all.filter((row) => row.label.toLowerCase() === wanted) : all;
     if (!rows.length) return wanted ? "no countdown called **" + values.label.trim() + "** in this server." : "no countdowns in this server yet. try /countdown set.";
 
-    const text = rows.map((row) => describe(row, lastRun())).join("\n\n");
+    const text = rows.map(describe).join("\n\n");
     return text.length > 1900 ? `${text.slice(0, 1900)}...` : text;
   }
 
@@ -214,7 +277,7 @@ export function createCommands({ db, client, lastRun = () => 0 }) {
   function handle(interaction) {
     const allowed = BigInt(interaction.member?.permissions ?? 0) & MANAGE_GUILD;
     if (!allowed) {
-      return { ack: { type: 4, data: { flags: EPHEMERAL, content: "you need manage server permission for this." } } };
+      return { ack: { type: 4, data: { flags: EPHEMERAL, content: "you need `manage server` permission for this." } } };
     }
 
     return {

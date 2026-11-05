@@ -1,4 +1,4 @@
-import { command } from "./commands.js";
+import { command, helpCommand } from "./commands.js";
 
 const { DISCORD_TOKEN, DISCORD_APP_ID } = process.env;
 if (!DISCORD_TOKEN || !DISCORD_APP_ID) {
@@ -9,7 +9,7 @@ if (!DISCORD_TOKEN || !DISCORD_APP_ID) {
 const res = await fetch(`https://discord.com/api/v10/applications/${DISCORD_APP_ID}/commands`, {
   method: "PUT",
   headers: { Authorization: `Bot ${DISCORD_TOKEN}`, "Content-Type": "application/json" },
-  body: JSON.stringify([command]),
+  body: JSON.stringify([command, helpCommand]),
 });
 
 if (!res.ok) {
@@ -17,4 +17,4 @@ if (!res.ok) {
   process.exit(1);
 }
 
-console.log("registered /countdown");
+console.log("registered /countdown, /help");

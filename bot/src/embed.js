@@ -12,11 +12,23 @@ export function cardName(label) {
   return `${slug || "card"}-${hash}.png`;
 }
 
+function updatedAt(now, timeZone) {
+  const date = new Intl.DateTimeFormat("en-GB", { day: "2-digit", month: "short", timeZone }).format(now);
+  const time = new Intl.DateTimeFormat("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+    timeZoneName: "short",
+    timeZone,
+  }).format(now);
+  return `${date.toLowerCase()}, ${time.toUpperCase()}`;
+}
+
 export function buildEmbed(countdown, now) {
   const embed = {
     color: 0x4a4a4a,
     image: { url: `attachment://${cardName(countdown.label)}` },
-    timestamp: now.toISOString(),
+    footer: { text: `updated ${updatedAt(now, countdown.timeZone)} / prothesmia.xyz` },
   };
   if (countdown.thumbnail) {
     embed.thumbnail = { url: countdown.thumbnail };
