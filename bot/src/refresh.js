@@ -3,10 +3,20 @@ import { drawCard } from "./card.js";
 import { buildEmbed, cardName } from "./embed.js";
 
 const HOUR = 3600000;
-const SLACK = 5 * 60000;
+
+const stepOf = (countdown) => intervalOf(countdown) * HOUR;
+
+const slotAt = (countdown, now) => {
+  const target = new Date(countdown.date).getTime();
+  const step = stepOf(countdown);
+  return target + Math.floor((now - target) / step) * step;
+};
+
+export const nextRefresh = (countdown, now = new Date()) =>
+  new Date(slotAt(countdown, now) + stepOf(countdown));
 
 const isDue = (countdown, now) =>
-  !countdown.refreshedAt || now - new Date(countdown.refreshedAt) >= intervalOf(countdown) * HOUR - SLACK;
+  !countdown.refreshedAt || new Date(countdown.refreshedAt) < slotAt(countdown, now);
 
 export const postsLater = (countdown, now = new Date()) =>
   Boolean(countdown.postAt) && new Date(countdown.postAt) > now;

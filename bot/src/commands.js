@@ -1,5 +1,5 @@
 import { validZone, parseInstant } from "./zone.js";
-import { refreshOne, postsLater } from "./refresh.js";
+import { refreshOne, postsLater, nextRefresh } from "./refresh.js";
 import { cardName } from "./embed.js";
 import { MIN_INTERVAL_HOURS, MAX_INTERVAL_HOURS, intervalOf } from "./time.js";
 import { RING_STYLES } from "./ring.js";
@@ -206,8 +206,6 @@ function asInput(row) {
   return input;
 }
 
-const HOUR = 3600000;
-
 const cadence = (hours) => (hours === 1 ? "every hour" : `every ${hours} hours`);
 
 const stamp = (date, style) => `<t:${Math.floor(new Date(date) / 1000)}:${style}>`;
@@ -219,7 +217,7 @@ function describe(row) {
   const refreshed = postsLater(row)
     ? `posts ${stamp(row.postAt, "f")}, ${stamp(row.postAt, "R")}, then every ${hours}h`
     : row.refreshedAt
-      ? `every ${hours}h, last refresh ${stamp(row.refreshedAt, "R")}, next ${stamp(new Date(row.refreshedAt).getTime() + hours * HOUR, "R")}`
+      ? `every ${hours}h, last refresh ${stamp(row.refreshedAt, "R")}, next ${stamp(nextRefresh(row), "R")}`
       : `every ${hours}h, first refresh pending`;
 
   return [
