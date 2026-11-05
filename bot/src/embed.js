@@ -28,7 +28,7 @@ export function buildEmbed(countdown, now) {
   const embed = {
     color: 0x4a4a4a,
     image: { url: `attachment://${cardName(countdown.label)}` },
-    footer: { text: `updated ${updatedAt(now, countdown.timeZone)} / prothesmia.xyz` },
+    footer: { text: `prothesmia.xyz / updated ${updatedAt(now, countdown.timeZone)}` },
   };
   if (countdown.thumbnail) {
     embed.thumbnail = { url: countdown.thumbnail };
