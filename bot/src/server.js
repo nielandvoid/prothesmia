@@ -20,8 +20,7 @@ const publicKey = createPublicKey({
 });
 
 const API = "https://discord.com/api/v10";
-const HOUR = 3600000;
-const STALE_AFTER = HOUR - 5 * 60000;
+const MIN_GAP = 60000;
 
 const db = await openDatabase({ url: process.env.TURSO_URL, authToken: process.env.TURSO_TOKEN });
 const client = connect(process.env.DISCORD_TOKEN);
@@ -31,7 +30,7 @@ let lastRun = 0;
 let running = false;
 
 async function refreshIfDue() {
-  if (running || Date.now() - lastRun < STALE_AFTER) return;
+  if (running || Date.now() - lastRun < MIN_GAP) return;
   running = true;
   try {
     await refreshAll(db, client);

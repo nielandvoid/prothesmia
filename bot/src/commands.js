@@ -1,5 +1,5 @@
 import { validZone, parseInstant } from "./zone.js";
-import { refreshOne } from "./refresh.js";
+import { refreshOne, postsLater } from "./refresh.js";
 import { cardName } from "./embed.js";
 import { MIN_INTERVAL_HOURS, MAX_INTERVAL_HOURS, intervalOf } from "./time.js";
 import { RING_STYLES } from "./ring.js";
@@ -7,6 +7,7 @@ import { RING_STYLES } from "./ring.js";
 const MANAGE_GUILD = 1n << 5n;
 const EPHEMERAL = 64;
 const FIELD_KEYS = ["target", "timeLeft", "elapsed"];
+const SCHEDULES = ["now", "start", "custom"];
 
 const option = (name, description, required = false) => ({ type: 3, name, description, required });
 
@@ -32,11 +33,16 @@ const settings = (editing) => [
     ],
   },
   {
-    ...option("interval",`hours between updates, ${MIN_INTERVAL_HOURS} to ${MAX_INTERVAL_HOURS}, defaults to ${MIN_INTERVAL_HOURS}`),
+    ...option("interval", `hours between updates, ${MIN_INTERVAL_HOURS} to ${MAX_INTERVAL_HOURS}, defaults to ${MIN_INTERVAL_HOURS}`),
     type: 4,
     min_value: MIN_INTERVAL_HOURS,
     max_value: MAX_INTERVAL_HOURS,
   },
+  {
+    ...option("schedule", "when to post the countdown; defaults to now"),
+    choices: SCHEDULES.map((name) => ({ name, value: name })),
+  },
+  option("post_at", "post time for a custom schedule, like 2027-01-04 09:00"),
 ];
 
 const picker = { ...option("label", "specify title if more than one countdown"), autocomplete: true };
@@ -98,6 +104,8 @@ export const helpText = [
   "`thumbnail` an image url for the top-right corner / thumbnail of the embed",
   "`dimensions` tall by default, or compact",
   "`ring` default / pride / trans",
+  "`schedule` now / start / custom",
+  "`post_at` the post time for a custom schedule; must be before the date",
   `\`interval\` hours between updates, ${MIN_INTERVAL_HOURS} to ${MAX_INTERVAL_HOURS}; defaults to ${MIN_INTERVAL_HOURS}`,
   "",
   "several countdowns can share a channel.",
@@ -149,6 +157,18 @@ function build(values, interaction) {
 
   const ringStyle = Object.hasOwn(RING_STYLES, values.ring) ? values.ring : undefined;
 
+  const schedule = values.schedule ?? "now";
+  let postAt;
+  if (schedule === "start") {
+    if (!start) return { error: "schedule start needs a start date." };
+    postAt = start;
+  }
+  if (schedule === "custom") {
+    postAt = values.post_at ? parseInstant(values.post_at, timeZone) : null;
+    if (!postAt) return { error: "schedule custom needs post_at, written like 2027-01-04 09:00." };
+    if (postAt >= date) return { error: "post_at has to be before the date." };
+  }
+
   const rawTag = values.tag?.toLowerCase();
   const tag = values.tag === undefined || rawTag === "default" ? undefined : rawTag === "none" ? "" : values.tag;
 
@@ -166,6 +186,8 @@ function build(values, interaction) {
       dimensions: values.dimensions,
       intervalHours,
       ringStyle,
+      schedule: schedule === "now" ? undefined : schedule,
+      postAt: postAt?.toISOString(),
     },
   };
 }
@@ -179,6 +201,8 @@ function asInput(row) {
   if (row.dimensions) input.dimensions = row.dimensions;
   if (row.intervalHours) input.interval = row.intervalHours;
   if (row.ringStyle) input.ring = row.ringStyle;
+  if (row.schedule) input.schedule = row.schedule;
+  if (row.schedule === "custom") input.post_at = row.postAt;
   return input;
 }
 
@@ -192,9 +216,11 @@ function describe(row) {
   const tag = row.tag === undefined ? "the label" : row.tag === "" ? "hidden" : row.tag;
   const fields = row.fields === undefined ? "all" : row.fields.length ? row.fields.join(", ") : "none";
   const hours = intervalOf(row);
-  const refreshed = row.refreshedAt
-    ? `every ${hours}h, last refresh ${stamp(row.refreshedAt, "R")}, next ${stamp(new Date(row.refreshedAt).getTime() + hours * HOUR, "R")}`
-    : `every ${hours}h, first refresh pending`;
+  const refreshed = postsLater(row)
+    ? `posts ${stamp(row.postAt, "f")}, ${stamp(row.postAt, "R")}, then every ${hours}h`
+    : row.refreshedAt
+      ? `every ${hours}h, last refresh ${stamp(row.refreshedAt, "R")}, next ${stamp(new Date(row.refreshedAt).getTime() + hours * HOUR, "R")}`
+      : `every ${hours}h, first refresh pending`;
 
   return [
     `**${row.label}** in <#${row.channelId}>`,
@@ -228,6 +254,9 @@ export function createCommands({ db, client }) {
       const { countdown, error } = build(values, interaction);
       if (error) return error;
       await db.save(countdown);
+      if (postsLater(countdown)) {
+        return `scheduled **${countdown.label}** in <#${countdown.channelId}> to post ${stamp(countdown.postAt, "f")}, ${stamp(countdown.postAt, "R")}.`;
+      }
       const result = await refreshOne(db, client, countdown);
       return `${result.action} **${countdown.label}** in <#${countdown.channelId}>. it refreshes ${cadence(intervalOf(countdown))}.`;
     }
@@ -240,7 +269,7 @@ export function createCommands({ db, client }) {
       const { countdown, error } = build({ ...asInput(found.row), ...changes }, interaction);
       if (error) return error;
       await db.save(countdown);
-      await refreshOne(db, client, countdown);
+      if (!postsLater(countdown)) await refreshOne(db, client, countdown);
       return `updated **${countdown.label}**: ${Object.keys(changes).join(", ")}.`;
     }
 

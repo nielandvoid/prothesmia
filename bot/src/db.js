@@ -3,6 +3,7 @@ import { createClient } from "@libsql/client/web";
 const FIELDS = [
   "id", "guild_id", "channel_id", "label", "date", "start", "tag", "time_zone",
   "fields", "thumbnail", "dimensions", "interval_hours", "refreshed_at", "ring_style",
+  "schedule", "post_at",
 ];
 
 export async function openDatabase({ url, authToken }) {
@@ -25,7 +26,7 @@ export async function openDatabase({ url, authToken }) {
   `);
 
   const { rows: columns } = await db.execute("pragma table_info(countdowns)");
-  for (const [name, type] of [["dimensions", "text"], ["interval_hours", "integer"], ["refreshed_at", "text"], ["ring_style", "text"]]) {
+  for (const [name, type] of [["dimensions", "text"], ["interval_hours", "integer"], ["refreshed_at", "text"], ["ring_style", "text"], ["schedule", "text"], ["post_at", "text"]]) {
     if (!columns.some((column) => column.name === name)) {
       await db.execute(`alter table countdowns add column ${name} ${type}`);
     }
@@ -46,6 +47,8 @@ export async function openDatabase({ url, authToken }) {
     intervalHours: row.interval_hours === null ? undefined : Number(row.interval_hours),
     refreshedAt: row.refreshed_at ?? undefined,
     ringStyle: row.ring_style ?? undefined,
+    schedule: row.schedule ?? undefined,
+    postAt: row.post_at ?? undefined,
   });
 
   return {
@@ -73,8 +76,8 @@ export async function openDatabase({ url, authToken }) {
     async save(c) {
       await db.execute({
         sql: `
-          insert into countdowns (guild_id, channel_id, label, date, start, tag, time_zone, fields, thumbnail, dimensions, interval_hours, ring_style)
-          values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          insert into countdowns (guild_id, channel_id, label, date, start, tag, time_zone, fields, thumbnail, dimensions, interval_hours, ring_style, schedule, post_at)
+          values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
           on conflict (channel_id, label) do update set
             date = excluded.date,
             start = excluded.start,
@@ -84,7 +87,9 @@ export async function openDatabase({ url, authToken }) {
             thumbnail = excluded.thumbnail,
             dimensions = excluded.dimensions,
             interval_hours = excluded.interval_hours,
-            ring_style = excluded.ring_style
+            ring_style = excluded.ring_style,
+            schedule = excluded.schedule,
+            post_at = excluded.post_at
         `,
         args: [
           c.guildId,
@@ -99,6 +104,8 @@ export async function openDatabase({ url, authToken }) {
           c.dimensions ?? null,
           c.intervalHours ?? null,
           c.ringStyle ?? null,
+          c.schedule ?? null,
+          c.postAt ?? null,
         ],
       });
     },

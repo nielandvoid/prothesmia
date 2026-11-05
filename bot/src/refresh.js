@@ -8,6 +8,9 @@ const SLACK = 5 * 60000;
 const isDue = (countdown, now) =>
   !countdown.refreshedAt || now - new Date(countdown.refreshedAt) >= intervalOf(countdown) * HOUR - SLACK;
 
+export const postsLater = (countdown, now = new Date()) =>
+  Boolean(countdown.postAt) && new Date(countdown.postAt) > now;
+
 export async function refreshOne(db, client, countdown, now = new Date()) {
   const png = await drawCard(countdown, measure(countdown, now));
   const result = await client.publish({
@@ -21,7 +24,7 @@ export async function refreshOne(db, client, countdown, now = new Date()) {
 }
 
 export async function refreshAll(db, client, now = new Date()) {
-  const due = (await db.all()).filter((countdown) => isDue(countdown, now));
+  const due = (await db.all()).filter((countdown) => !postsLater(countdown, now) && isDue(countdown, now));
   let failed = 0;
 
   for (const countdown of due) {
@@ -33,5 +36,5 @@ export async function refreshAll(db, client, now = new Date()) {
     }
   }
 
-  console.log(`refreshed ${due.length - failed} of ${due.length} due`);
+  if (due.length) console.log(`refreshed ${due.length - failed} of ${due.length} due`);
 }
