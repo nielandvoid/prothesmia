@@ -11,9 +11,9 @@ const FIELD_KEYS = ["target", "timeLeft", "elapsed"];
 const option = (name, description, required = false) => ({ type: 3, name, description, required });
 
 const settings = (editing) => [
-  option("deadline", editing ? "new deadline, like 2027-01-04 09:00" : "deadline as 2027-01-04 09:00", !editing),
+  option("date", editing ? "new date, like 2027-01-04 09:00" : "date as 2027-01-04 09:00", !editing),
   option("timezone", "IANA zone like Asia/Kolkata, defaults to UTC"),
-  option("start", "when the ring starts filling, none to clear"),
+  option("start", "when the countdown is set, before the set date, none to clear"),
   option("tag", "small text in the top corner, none to hide it, default for the label"),
   option("fields", "rows beside the ring: target, timeLeft, elapsed, none or default"),
   option("thumbnail", "image url for the embed corner, none to clear"),
@@ -90,9 +90,9 @@ export const helpText = [
   "",
   "**config**",
   "`label` the title, for example JEE Main 2027",
-  "`deadline` written like 2027-01-04 09:00",
+  "`date` written like 2027-01-04 09:00",
   "`timezone` an IANA name such as Asia/Kolkata; defaults to UTC",
-  "`start` when the ring starts filling, a full ring if left out",
+  "`start` when the countdown is set, before the set date; optional",
   "`tag` small text in the top-right corner, none to hide",
   "`fields` beside the ring: target, timeLeft, elapsed, or none for nothing",
   "`thumbnail` an image url for the top-right corner / thumbnail of the embed",
@@ -116,14 +116,14 @@ function build(values, interaction) {
   const timeZone = values.timezone ?? "UTC";
   if (!validZone(timeZone)) return { error: `${timeZone} is not a time zone name. try Asia/Kolkata or Europe/London.` };
 
-  const date = parseInstant(values.deadline, timeZone);
+  const date = values.date ? parseInstant(values.date, timeZone) : null;
   if (!date) return { error: "couldn't read the date. write it like 2027-01-04 09:00." };
 
   let start;
   if (values.start && values.start.toLowerCase() !== "none") {
     start = parseInstant(values.start, timeZone);
     if (!start) return { error: "couldn't read the start date. write it like 2026-04-01." };
-    if (start >= date) return { error: "start has to be before the deadline." };
+    if (start >= date) return { error: "start has to be before the date." };
   }
 
   let fields;
@@ -171,7 +171,7 @@ function build(values, interaction) {
 }
 
 function asInput(row) {
-  const input = { label: row.label, deadline: row.date, timezone: row.timeZone };
+  const input = { label: row.label, date: row.date, timezone: row.timeZone };
   if (row.start) input.start = row.start;
   if (row.tag !== undefined) input.tag = row.tag === "" ? "none" : row.tag;
   if (row.fields !== undefined) input.fields = row.fields.length ? row.fields.join(", ") : "none";
@@ -198,7 +198,7 @@ function describe(row) {
 
   return [
     `**${row.label}** in <#${row.channelId}>`,
-    `deadline ${stamp(row.date, "f")}, ${stamp(row.date, "R")}`,
+    `date ${stamp(row.date, "f")}, ${stamp(row.date, "R")}`,
     `time zone ${row.timeZone}, start ${row.start ? stamp(row.start, "d") : "none"}`,
     `tag ${tag}, fields ${fields}, dimensions ${row.dimensions ?? "tall"}, ring ${row.ringStyle ?? "default"}`,
     `thumbnail ${row.thumbnail ?? "none"}`,
