@@ -241,7 +241,7 @@ export function createCommands({ db, client }) {
       if (error) return error;
       await db.save(countdown);
       await refreshOne(db, client, countdown);
-      return `updated **${countdown.label}**.`;
+      return `updated **${countdown.label}**: ${Object.keys(changes).join(", ")}.`;
     }
 
     if (name === "remove") {
