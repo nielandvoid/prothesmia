@@ -1,0 +1,300 @@
+:root {
+  --bg: #1b1b1b;
+  --fg: #e8e8e6;
+  --muted: #8a8a8a;
+  --value: #b9b9b7;
+  --track: #2e2e2e;
+  --line: rgba(232, 232, 230, 0.2);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  -webkit-font-smoothing: antialiased;
+}
+
+@font-face {
+  font-family: "card sans";
+  src: url("fonts/geist-400.woff") format("woff");
+  font-display: block;
+}
+
+@font-face {
+  font-family: "card mono";
+  src: url("fonts/geist-mono-500.woff") format("woff");
+  font-display: block;
+}
+
+@font-face {
+  font-family: "card greek";
+  src: url("fonts/inter-greek-300.woff") format("woff");
+  font-display: block;
+}
+
+.stage {
+  height: 100%;
+}
+
+.frame {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  container-type: size;
+}
+
+.card {
+  --unit: min(0.1cqw, calc(100cqh / var(--cardheight)));
+  --pad: 50;
+  --head-y: 45.1;
+  --cardheight: 700;
+  --ringsize: 430;
+  --ringx: 251.2;
+  --ringy: 350.1;
+  --tleft: 504.5;
+  --ttop: calc(var(--ringy) - var(--rows) * var(--rheight) / 2);
+  --rheight: 96;
+  --foot-y: 660;
+  --rows: 3;
+  --clocky: 548;
+  position: relative;
+  --ox: max(0px, calc((min(100cqw, 1000 * var(--unit) * 1.95) - 1000 * var(--unit)) / 2));
+  width: min(100cqw, calc(1000 * var(--unit) * 1.95));
+  height: calc(var(--cardheight) * var(--unit));
+  font-family: "card sans", sans-serif;
+}
+
+.card[data-size="compact"] {
+  --cardheight: 500;
+  --ringsize: 290;
+  --ringx: 185.7;
+  --ringy: 270.1;
+  --tleft: 373.4;
+  --rheight: 68;
+  --foot-y: 460;
+}
+
+.card[data-clock] {
+  --ringsize: 360;
+  --ringx: 216.2;
+  --ringy: 320;
+  --tleft: 434.5;
+  --clocky: 548;
+}
+
+.card[data-clock][data-size="compact"] {
+  --ringsize: 235;
+  --ringx: 158.2;
+  --ringy: 250;
+  --tleft: 318.4;
+  --clocky: 405;
+}
+
+.card[data-plain],
+.card[data-plain][data-clock][data-size] {
+  --ringx: 500;
+}
+
+.card-wmark {
+  position: absolute;
+  left: calc(var(--pad) * var(--unit));
+  top: 0;
+  width: calc(258 * var(--unit));
+  height: calc(90.2 * var(--unit));
+  border: 1px solid var(--line);
+  border-top: none;
+}
+
+.card-dot {
+  position: absolute;
+  left: calc(81 * var(--unit));
+  top: calc(39.5 * var(--unit));
+  width: calc(13.2 * var(--unit));
+  height: calc(13.2 * var(--unit));
+  border-radius: 50%;
+  background: var(--fg);
+  box-shadow: 0 0 calc(16 * var(--unit)) color-mix(in srgb, var(--fg) 85%, transparent);
+}
+
+.card-name {
+  --fontsize: 30.8;
+  position: absolute;
+  left: calc(113.8 * var(--unit));
+  top: calc((var(--head-y) - var(--fontsize) / 2) * var(--unit));
+  font: 300 calc(var(--fontsize) * var(--unit)) / 1 "card greek", sans-serif;
+  letter-spacing: 0.02em;
+  color: var(--fg);
+  white-space: nowrap;
+}
+
+.card-tag,
+.card-foot,
+.card-table span {
+  font-size: calc(var(--fontsize) * var(--unit));
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.card-tag {
+  --fontsize: 24;
+  position: absolute;
+  right: calc(var(--pad) * var(--unit));
+  top: calc((var(--head-y) - var(--fontsize) / 2) * var(--unit));
+  line-height: 1;
+  color: var(--muted);
+}
+
+.card-ring {
+  position: absolute;
+  left: calc(var(--ox) + (var(--ringx) - var(--ringsize) / 2) * var(--unit));
+  top: calc((var(--ringy) - var(--ringsize) / 2) * var(--unit));
+  width: calc(var(--ringsize) * var(--unit));
+  height: calc(var(--ringsize) * var(--unit));
+  overflow: visible;
+}
+
+.card-ring circle,
+.card-ring path {
+  fill: none;
+  stroke-width: 6.88;
+}
+
+.ring-track {
+  stroke: var(--track);
+}
+
+.ring-fill {
+  stroke: var(--fg);
+  stroke-linecap: round;
+}
+
+.card[data-styled] .ring-fill {
+  display: none;
+}
+
+.card-ring text {
+  dominant-baseline: central;
+  text-anchor: middle;
+}
+
+.ring-value {
+  fill: var(--fg);
+  font-family: "card mono", monospace;
+  font-size: 146.2px;
+}
+
+.ring-unit {
+  fill: var(--muted);
+  font-family: "card sans", sans-serif;
+  font-size: 32.7px;
+  letter-spacing: 1px;
+}
+
+.card-table {
+  position: absolute;
+  left: calc(var(--ox) + var(--tleft) * var(--unit));
+  top: calc(var(--ttop) * var(--unit));
+  right: calc(var(--ox) + var(--pad) * var(--unit));
+  border: 1px solid var(--line);
+}
+
+.card-table:empty {
+  display: none;
+}
+
+.card-table div {
+  --fontsize: 25;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: calc(var(--rheight) * var(--unit));
+  padding: 0 calc(26 * var(--unit));
+  color: var(--muted);
+}
+
+.card-table div + div {
+  border-top: 1px solid var(--line);
+}
+
+.card-table span + span {
+  color: var(--value);
+}
+
+.card-clock {
+  position: absolute;
+  left: calc(var(--ox) + (var(--ringx) - 200) * var(--unit));
+  top: calc((var(--clocky) - 15) * var(--unit));
+  display: none;
+  width: calc(400 * var(--unit));
+  height: calc(30 * var(--unit));
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font: 500 calc(27 * var(--unit)) / 1 "card mono", monospace;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.card[data-clock] .card-clock {
+  display: flex;
+}
+
+.card-foot {
+  --fontsize: 24;
+  position: absolute;
+  right: calc(var(--pad) * var(--unit));
+  top: calc((var(--foot-y) - var(--fontsize) / 2) * var(--unit));
+  line-height: 1;
+  color: var(--muted);
+}
+
+.card-message {
+  position: absolute;
+  inset: calc(90 * var(--unit)) 0 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  color: var(--muted);
+  font-size: calc(26 * var(--unit));
+  letter-spacing: 0.5px;
+}
+
+.card[data-state="empty"] .card-message,
+.card[data-state="error"] .card-message {
+  display: flex;
+}
+
+.card[data-state="empty"] .card-clock,
+.card[data-state="error"] .card-clock,
+.card[data-state="loading"] .card-clock,
+.card[data-state="empty"] .card-ring,
+.card[data-state="error"] .card-ring,
+.card[data-state="empty"] .card-table,
+.card[data-state="error"] .card-table,
+.card[data-state="loading"] .card-ring,
+.card[data-state="loading"] .card-table,
+.card[data-state="empty"] .card-foot,
+.card[data-state="error"] .card-foot {
+  display: none;
+}
+
+@container (min-width: 600px) and (max-height: 400px) {
+  .card-tag {
+    --fontsize: 36;
+  }
+
+  .card-foot {
+    --fontsize: 36;
+  }
+}

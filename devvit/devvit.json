@@ -1,0 +1,176 @@
+{
+  "$schema": "https://developers.reddit.com/schema/config-file.v1.json",
+  "name": "prothesmia",
+  "post": {
+    "dir": "dist/client",
+    "entrypoints": {
+      "default": {
+        "inline": true,
+        "entry": "countdown.html"
+      }
+    }
+  },
+  "server": {
+    "dir": "dist/server",
+    "entry": "index.cjs"
+  },
+  "permissions": {
+    "reddit": true
+  },
+  "menu": {
+    "items": [
+      {
+        "label": "Create countdown post",
+        "description": "post the countdown card",
+        "location": "subreddit",
+        "forUserType": "moderator",
+        "endpoint": "/internal/menu/create-post"
+      },
+      {
+        "label": "Post scheduled thread now",
+        "description": "post the scheduled thread now",
+        "location": "subreddit",
+        "forUserType": "moderator",
+        "endpoint": "/internal/menu/scheduled-now"
+      }
+    ]
+  },
+  "scheduler": {
+    "tasks": {
+      "scheduled-thread": {
+        "endpoint": "/internal/scheduler/scheduled-thread",
+        "cron": "*/15 * * * *"
+      }
+    }
+  },
+  "settings": {
+    "subreddit": {
+      "events": {
+        "type": "string",
+        "label": "Events",
+        "helpText": "name | event date | optional: countdown start (ring fills gradually). separate events with ;",
+        "defaultValue": "Event | 2027-01-01 00:00",
+        "validationEndpoint": "/internal/settings/validate-events"
+      },
+      "timezone": {
+        "type": "string",
+        "label": "Timezone",
+        "helpText": "like Asia/Kolkata",
+        "defaultValue": "Asia/Kolkata",
+        "validationEndpoint": "/internal/settings/validate-timezone"
+      },
+      "ring": {
+        "type": "select",
+        "label": "Ring style",
+        "options": [
+          {
+            "label": "Default",
+            "value": "default"
+          },
+          {
+            "label": "Pride",
+            "value": "pride"
+          },
+          {
+            "label": "Trans",
+            "value": "trans"
+          }
+        ],
+        "defaultValue": "default"
+      },
+      "dimensions": {
+        "type": "select",
+        "label": "Card size",
+        "options": [
+          {
+            "label": "Tall",
+            "value": "tall"
+          },
+          {
+            "label": "Compact",
+            "value": "compact"
+          },
+          {
+            "label": "Desktop",
+            "value": "desktop"
+          }
+        ],
+        "defaultValue": "tall",
+        "helpText": "avoid Desktop if most of your members use the phone client."
+      },
+      "fields": {
+        "type": "multiSelect",
+        "label": "Fields beside the ring",
+        "helpText": "deselect all for just the ring.",
+        "options": [
+          {
+            "label": "Target",
+            "value": "target"
+          },
+          {
+            "label": "Time left",
+            "value": "timeLeft"
+          },
+          {
+            "label": "Elapsed",
+            "value": "elapsed"
+          }
+        ],
+        "defaultValue": [
+          "target",
+          "timeLeft",
+          "elapsed"
+        ]
+      },
+      "tag": {
+        "type": "string",
+        "label": "Tag",
+        "helpText": "corner text. blank shows the event name, \"none\" to hide.",
+        "defaultValue": ""
+      },
+      "clock": {
+        "type": "boolean",
+        "label": "Live clock",
+        "helpText": "ticking d h m s under a smaller ring",
+        "defaultValue": false
+      },
+      "postTitle": {
+        "type": "string",
+        "label": "Countdown post title",
+        "helpText": "reddit won't let you edit a title later.",
+        "defaultValue": "Event countdown"
+      },
+      "scheduledEnabled": {
+        "type": "boolean",
+        "label": "Post a scheduled thread",
+        "defaultValue": false
+      },
+      "scheduledHour": {
+        "type": "number",
+        "label": "Scheduled thread hour",
+        "helpText": "0 to 23, in the timezone above",
+        "defaultValue": 0,
+        "validationEndpoint": "/internal/settings/validate-hour"
+      },
+      "scheduledTitle": {
+        "type": "string",
+        "label": "Scheduled thread title",
+        "helpText": "you can use {days}, {event} and {date}.",
+        "defaultValue": "Scheduled thread: {days} days to {event}"
+      },
+      "scheduledBody": {
+        "type": "string",
+        "label": "Scheduled thread text",
+        "helpText": "you can use {days}, {event} and {date}.",
+        "defaultValue": "whatever it is - talk about it here. keep it civil."
+      }
+    }
+  },
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "vite build"
+  },
+  "dev": {
+    "subreddit": "prothesmia_dev"
+  }
+}

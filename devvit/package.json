@@ -1,0 +1,31 @@
+{
+  "private": true,
+  "name": "prothesmia",
+  "version": "0.0.0",
+  "license": "BSD-3-Clause",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "check": "tsc",
+    "test": "node --experimental-strip-types --no-warnings=ExperimentalWarning --test \"src/**/*.test.ts\"",
+    "dev": "devvit playtest",
+    "deploy": "npm run check && npm run test && devvit upload",
+    "launch": "npm run deploy && devvit publish",
+    "login": "devvit login"
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "dependencies": {
+    "@devvit/start": "0.15.2",
+    "@devvit/web": "0.15.2",
+    "@hono/node-server": "2.1.6",
+    "devvit": "0.15.2",
+    "hono": "4.13.16"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.3",
+    "typescript": "6.0.3",
+    "vite": "8.3.5"
+  }
+}

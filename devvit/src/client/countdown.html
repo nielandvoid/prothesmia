@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>prothesmia</title>
+    <link rel="stylesheet" href="countdown.css" />
+  </head>
+  <body>
+    <main class="stage" id="stage">
+      <div class="frame">
+        <div class="card" id="card" data-state="loading">
+          <div class="card-wmark"></div>
+          <div class="card-dot"></div>
+          <div class="card-name">προθεσμία</div>
+          <div class="card-tag" id="tag"></div>
+          <svg class="card-ring" viewBox="-215 -215 430 430" aria-hidden="true">
+            <circle class="ring-track" r="197.8" />
+            <circle class="ring-fill" id="fill" r="197.8" pathLength="1" transform="rotate(-90)" />
+            <g id="paint"></g>
+            <text class="ring-value" id="value" y="-17.2"></text>
+            <text class="ring-unit" id="unit" y="68.8"></text>
+          </svg>
+          <div class="card-clock" id="clock"></div>
+          <div class="card-table" id="table"></div>
+          <div class="card-foot" id="foot"></div>
+          <p class="card-message" id="message"></p>
+        </div>
+      </div>
+    </main>
+    <script type="module" src="countdown.js"></script>
+  </body>
+</html>
