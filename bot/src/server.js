@@ -4,6 +4,7 @@ import { openDatabase } from "./db.js";
 import { connect } from "./discord.js";
 import { createCommands, helpText } from "./commands.js";
 import { refreshAll } from "./refresh.js";
+import { bumpAll } from "./bump.js";
 
 const required = ["DISCORD_TOKEN", "DISCORD_APP_ID", "DISCORD_PUBLIC_KEY", "TURSO_URL", "TURSO_TOKEN"];
 const missing = required.filter((name) => !process.env[name]);
@@ -34,6 +35,7 @@ async function refreshIfDue() {
   running = true;
   try {
     await refreshAll(db, client);
+    await bumpAll(db, client);
     lastRun = Date.now();
   } catch (error) {
     console.error(`refresh failed: ${error.message}`);

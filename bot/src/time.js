@@ -5,7 +5,13 @@ const MINUTE = 60000;
 export const MIN_INTERVAL_HOURS = 1;
 export const MAX_INTERVAL_HOURS = 24;
 
+export const MIN_BUMP_HOURS = 1;
+export const MAX_BUMP_HOURS = 168;
+export const DEFAULT_BUMP_HOURS = 24;
+
 export const intervalOf = (countdown) => countdown.intervalHours ?? MIN_INTERVAL_HOURS;
+
+export const bumpIntervalOf = (countdown) => countdown.bumpIntervalHours ?? DEFAULT_BUMP_HOURS;
 
 export function measure(countdown, now) {
   const target = new Date(countdown.date);

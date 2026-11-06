@@ -3,7 +3,7 @@ import { createClient } from "@libsql/client/web";
 const FIELDS = [
   "id", "guild_id", "channel_id", "label", "date", "start", "tag", "time_zone",
   "fields", "thumbnail", "dimensions", "interval_hours", "refreshed_at", "ring_style",
-  "schedule", "post_at",
+  "schedule", "post_at", "bump", "bump_interval", "bumped_at",
 ];
 
 export async function openDatabase({ url, authToken }) {
@@ -26,7 +26,7 @@ export async function openDatabase({ url, authToken }) {
   `);
 
   const { rows: columns } = await db.execute("pragma table_info(countdowns)");
-  for (const [name, type] of [["dimensions", "text"], ["interval_hours", "integer"], ["refreshed_at", "text"], ["ring_style", "text"], ["schedule", "text"], ["post_at", "text"]]) {
+  for (const [name, type] of [["dimensions", "text"], ["interval_hours", "integer"], ["refreshed_at", "text"], ["ring_style", "text"], ["schedule", "text"], ["post_at", "text"], ["bump", "integer"], ["bump_interval", "integer"], ["bumped_at", "text"]]) {
     if (!columns.some((column) => column.name === name)) {
       await db.execute(`alter table countdowns add column ${name} ${type}`);
     }
@@ -49,6 +49,9 @@ export async function openDatabase({ url, authToken }) {
     ringStyle: row.ring_style ?? undefined,
     schedule: row.schedule ?? undefined,
     postAt: row.post_at ?? undefined,
+    bump: Number(row.bump) === 1,
+    bumpIntervalHours: row.bump_interval === null ? undefined : Number(row.bump_interval),
+    bumpedAt: row.bumped_at ?? undefined,
   });
 
   return {
@@ -76,8 +79,8 @@ export async function openDatabase({ url, authToken }) {
     async save(c) {
       await db.execute({
         sql: `
-          insert into countdowns (guild_id, channel_id, label, date, start, tag, time_zone, fields, thumbnail, dimensions, interval_hours, ring_style, schedule, post_at)
-          values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          insert into countdowns (guild_id, channel_id, label, date, start, tag, time_zone, fields, thumbnail, dimensions, interval_hours, ring_style, schedule, post_at, bump, bump_interval, bumped_at)
+          values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
           on conflict (channel_id, label) do update set
             date = excluded.date,
             start = excluded.start,
@@ -89,7 +92,10 @@ export async function openDatabase({ url, authToken }) {
             interval_hours = excluded.interval_hours,
             ring_style = excluded.ring_style,
             schedule = excluded.schedule,
-            post_at = excluded.post_at
+            post_at = excluded.post_at,
+            bump = excluded.bump,
+            bump_interval = excluded.bump_interval,
+            bumped_at = case when excluded.bump = 1 then coalesce(countdowns.bumped_at, excluded.bumped_at) else null end
         `,
         args: [
           c.guildId,
@@ -106,6 +112,9 @@ export async function openDatabase({ url, authToken }) {
           c.ringStyle ?? null,
           c.schedule ?? null,
           c.postAt ?? null,
+          c.bump ? 1 : 0,
+          c.bumpIntervalHours ?? null,
+          c.bump ? new Date().toISOString() : null,
         ],
       });
     },
@@ -113,6 +122,13 @@ export async function openDatabase({ url, authToken }) {
     async markRefreshed(channelId, label, at) {
       await db.execute({
         sql: "update countdowns set refreshed_at = ? where channel_id = ? and label = ?",
+        args: [at.toISOString(), channelId, label],
+      });
+    },
+
+    async markBumped(channelId, label, at) {
+      await db.execute({
+        sql: "update countdowns set bumped_at = ? where channel_id = ? and label = ?",
         args: [at.toISOString(), channelId, label],
       });
     },

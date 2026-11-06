@@ -1,5 +1,6 @@
 const API = "https://discord.com/api/v10";
 const SUPPRESS_NOTIFICATIONS = 1 << 12;
+const BUMP_LIFETIME = 5000;
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -79,5 +80,19 @@ export function connect(token) {
     return { action: "posted", id: created.id };
   }
 
-  return { publish, remove };
+  async function flash({ channelId, content }) {
+    const sent = await request("POST", `/channels/${channelId}/messages`, {
+      content,
+      flags: SUPPRESS_NOTIFICATIONS,
+      allowed_mentions: { parse: [] },
+    });
+    setTimeout(() => {
+      request("DELETE", `/channels/${channelId}/messages/${sent.id}`).catch((error) =>
+        console.error(`${channelId}: could not delete bump ${sent.id}: ${error.message}`),
+      );
+    }, BUMP_LIFETIME);
+    return sent;
+  }
+
+  return { publish, remove, flash };
 }

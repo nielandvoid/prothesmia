@@ -1,13 +1,22 @@
 import { validZone, parseInstant } from "./zone.js";
 import { refreshOne, postsLater, nextRefresh } from "./refresh.js";
 import { cardName } from "./embed.js";
-import { MIN_INTERVAL_HOURS, MAX_INTERVAL_HOURS, intervalOf } from "./time.js";
+import {
+  MIN_INTERVAL_HOURS,
+  MAX_INTERVAL_HOURS,
+  MIN_BUMP_HOURS,
+  MAX_BUMP_HOURS,
+  DEFAULT_BUMP_HOURS,
+  intervalOf,
+  bumpIntervalOf,
+} from "./time.js";
 import { RING_STYLES } from "./ring.js";
 
 const MANAGE_GUILD = 1n << 5n;
 const EPHEMERAL = 64;
 const FIELD_KEYS = ["target", "timeLeft", "elapsed"];
 const SCHEDULES = ["now", "start", "custom"];
+const NO_ACCESS = /"code": (50013|50001)/;
 
 const option = (name, description, required = false) => ({ type: 3, name, description, required });
 
@@ -43,6 +52,13 @@ const settings = (editing) => [
     choices: SCHEDULES.map((name) => ({ name, value: name })),
   },
   option("post_at", "post time for a custom schedule, like 2027-01-04 09:00"),
+  { ...option("bump", "post a short message that deletes itself, to wake the channel; on or off"), type: 5 },
+  {
+    ...option("bump-interval", `hours between bumps, ${MIN_BUMP_HOURS} to ${MAX_BUMP_HOURS}, defaults to ${DEFAULT_BUMP_HOURS}`),
+    type: 4,
+    min_value: MIN_BUMP_HOURS,
+    max_value: MAX_BUMP_HOURS,
+  },
 ];
 
 const picker = { ...option("label", "specify title if more than one countdown"), autocomplete: true };
@@ -107,6 +123,8 @@ export const helpText = [
   "`schedule` now / start / custom",
   "`post_at` the post time for a custom schedule; must be before the date",
   `\`interval\` hours between updates, ${MIN_INTERVAL_HOURS} to ${MAX_INTERVAL_HOURS}; defaults to ${MIN_INTERVAL_HOURS}`,
+  "`bump` on or off; a short message that deletes itself after 5 seconds, to wake the channel",
+  `\`bump-interval\` hours between bumps, ${MIN_BUMP_HOURS} to ${MAX_BUMP_HOURS}; defaults to ${DEFAULT_BUMP_HOURS}`,
   "",
   "several countdowns can share a channel.",
   "",
@@ -122,7 +140,7 @@ function parseCommand(interaction) {
 
 function build(values, interaction) {
   const timeZone = values.timezone ?? "UTC";
-  if (!validZone(timeZone)) return { error: `${timeZone} is not a time zone name. try Asia/Kolkata or Europe/London.` };
+  if (!validZone(timeZone)) return { error: `${timeZone} is not a timezone name. try Asia/Kolkata or Europe/London.` };
 
   const date = values.date ? parseInstant(values.date, timeZone) : null;
   if (!date) return { error: "couldn't read the date. write it like 2027-01-04 09:00." };
@@ -153,6 +171,16 @@ function build(values, interaction) {
     const valid = Number.isInteger(values.interval) && values.interval >= MIN_INTERVAL_HOURS && values.interval <= MAX_INTERVAL_HOURS;
     if (!valid) return { error: `interval has to be a whole number of hours from ${MIN_INTERVAL_HOURS} to ${MAX_INTERVAL_HOURS}.` };
     intervalHours = values.interval;
+  }
+
+  const bump = values.bump === true;
+
+  let bumpIntervalHours;
+  if (values["bump-interval"] !== undefined) {
+    const hours = values["bump-interval"];
+    const valid = Number.isInteger(hours) && hours >= MIN_BUMP_HOURS && hours <= MAX_BUMP_HOURS;
+    if (!valid) return { error: `bump-interval has to be a whole number of hours from ${MIN_BUMP_HOURS} to ${MAX_BUMP_HOURS}.` };
+    bumpIntervalHours = hours;
   }
 
   const ringStyle = Object.hasOwn(RING_STYLES, values.ring) ? values.ring : undefined;
@@ -188,6 +216,8 @@ function build(values, interaction) {
       ringStyle,
       schedule: schedule === "now" ? undefined : schedule,
       postAt: postAt?.toISOString(),
+      bump,
+      bumpIntervalHours,
     },
   };
 }
@@ -203,6 +233,8 @@ function asInput(row) {
   if (row.ringStyle) input.ring = row.ringStyle;
   if (row.schedule) input.schedule = row.schedule;
   if (row.schedule === "custom") input.post_at = row.postAt;
+  if (row.bump) input.bump = true;
+  if (row.bumpIntervalHours) input["bump-interval"] = row.bumpIntervalHours;
   return input;
 }
 
@@ -223,9 +255,12 @@ function describe(row) {
   return [
     `**${row.label}** in <#${row.channelId}>`,
     `date ${stamp(row.date, "f")}, ${stamp(row.date, "R")}`,
-    `time zone ${row.timeZone}, start ${row.start ? stamp(row.start, "d") : "none"}`,
+    `timezone ${row.timeZone}, start ${row.start ? stamp(row.start, "d") : "none"}`,
     `tag ${tag}, fields ${fields}, dimensions ${row.dimensions ?? "tall"}, ring ${row.ringStyle ?? "default"}`,
     `thumbnail ${row.thumbnail ?? "none"}`,
+    row.bump
+      ? `bump every ${bumpIntervalOf(row)}h${row.bumpedAt ? `, last ${stamp(row.bumpedAt, "R")}` : ""}`
+      : "bump off",
     refreshed,
   ].join("\n");
 }
@@ -312,6 +347,9 @@ export function createCommands({ db, client }) {
       work: () =>
         run(interaction).catch((error) => {
           console.error(`${interaction.guild_id}: ${error.message}`);
+          if (NO_ACCESS.test(error.message)) {
+            return `i can't post in <#${interaction.channel_id}>. give my role view channel, send messages, embed links, attach files and read message history there.`;
+          }
           return `something went wrong: ${error.message.slice(0, 300)}`;
         }),
     };
