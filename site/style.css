@@ -900,6 +900,10 @@ code {
   image-rendering: pixelated;
 }
 
+.footer nav .phone {
+  display: none;
+}
+
 
 .footer a:hover {
   color: var(--muted);
@@ -956,11 +960,30 @@ code {
 
 @media (max-width: 600px) {
   .header {
-    padding-left: 24px;
+    padding-left: 20px;
   }
 
   .wordmark {
     transform: none;
+  }
+
+  .corner > .icon-btn:not(.klepsydra-link) {
+    display: none;
+  }
+
+  .footer nav {
+    flex: 1 1 100%;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 8px 20px;
+  }
+
+  .footer nav .phone {
+    display: inline;
+  }
+
+  .footer nav .wide {
+    display: none;
   }
 }
 
@@ -987,7 +1010,8 @@ code {
   }
 
   .btn:not(.primary) {
-    padding: 0 10px;
+    padding: 0 0.7em;
+    font-size: clamp(11px, 3.1vw, 13px);
   }
 
   .perms {
@@ -995,23 +1019,13 @@ code {
   }
 }
 
-@media (max-width: 359px) {
+@media (max-width: 329px) {
   .actions {
     grid-template-columns: repeat(3, max-content);
   }
 }
 
-@media (max-width: 340px) {
-  .actions {
-    column-gap: 6px;
-  }
-
-  .btn:not(.primary) {
-    padding: 0 9px;
-  }
-}
-
-@media (max-width: 480px) {
+@media (max-width: 359px) {
   .klepsydra-name {
     display: none;
   }
