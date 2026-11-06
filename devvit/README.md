@@ -26,6 +26,12 @@ mod menu
 - create countdown post
 - post scheduled thread now
 
+permissions
+- the app runs as its own account. reddit adds that account to your community as a moderator with full permissions
+- it uses that to post the countdown, post the scheduled thread and pin them
+- it keeps two small values in reddit's own app storage: the date of the last scheduled thread and that thread's post id
+- it stores nothing about the people who view or comment on its posts
+
 notes
 - the card size is fixed when a post is made. change it, then make a new post
 - the app posts and pins as its own account, which gets mod permissions in your community
@@ -46,6 +52,12 @@ npm test
 npm run build
 ```
 
+changelog
+- 0.0.7 - add `"marketingAssets": { "icon": "assets/icon.png" }`
+- 0.0.6 - approved for the public listing
+- 0.0.5 - first version on reddit
+
 links
 - site: [prothesmia.xyz](https://prothesmia.xyz)
 - source: [github.com/nielandvoid/prothesmia](https://github.com/nielandvoid/prothesmia)
+- [terms](https://prothesmia.xyz/terms/) and [privacy](https://prothesmia.xyz/privacy/)
