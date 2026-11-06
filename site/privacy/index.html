@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>privacy - προθεσμία</title>
+  <meta name="description" content="what prothesmia stores, and what it doesn't.">
+  <link rel="canonical" href="https://prothesmia.xyz/privacy/">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@200;300;400;500&display=swap">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="icon" type="image/svg+xml" sizes="any" href="/favicon.svg">
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="/assets/32x32.svg">
+  <link rel="apple-touch-icon" href="/assets/180x180.png">
+  <link rel="manifest" href="/site.webmanifest">
+</head>
+<body>
+  <header class="header">
+    <a class="wordmark" href="/"><span class="dot"></span>προθεσμία</a>
+    <nav class="headerlinks">
+      <a class="icon-btn" href="https://github.com/nielandvoid/prothesmia" target="_blank" rel="noopener noreferrer" data-tip="src" aria-label="src">
+        <svg width="22" height="22" viewBox="0 0 128 128" fill="currentColor"><path d="M56.7937 84.9688C44.4187 83.4688 35.7 74.5625 35.7 63.0313C35.7 58.3438 37.3875 53.2813 40.2 49.9063C38.9812 46.8125 39.1687 40.25 40.575 37.5313C44.325 37.0625 49.3875 39.0313 52.3875 41.75C55.95 40.625 59.7 40.0625 64.2937 40.0625C68.8875 40.0625 72.6375 40.625 76.0125 41.6563C78.9187 39.0313 84.075 37.0625 87.825 37.5313C89.1375 40.0625 89.325 46.625 88.1062 49.8125C91.1062 53.375 92.7 58.1563 92.7 63.0313C92.7 74.5625 83.9812 83.2813 71.4187 84.875C74.6062 86.9375 76.7625 91.4375 76.7625 96.5938L76.7625 106.344C76.7625 109.156 79.1062 110.75 81.9187 109.625C98.8875 103.156 112.2 86.1875 112.2 65.1875C112.2 38.6563 90.6375 17 64.1062 17C37.575 17 16.2 38.6562 16.2 65.1875C16.2 86 29.4187 103.25 47.2312 109.719C49.7625 110.656 52.2 108.969 52.2 106.438L52.2 98.9375C50.8875 99.5 49.2 99.875 47.7 99.875C41.5125 99.875 37.8562 96.5 35.2312 90.2188C34.2 87.6875 33.075 86.1875 30.9187 85.9063C29.7937 85.8125 29.4187 85.3438 29.4187 84.7813C29.4187 83.6563 31.2937 82.8125 33.1687 82.8125C35.8875 82.8125 38.2312 84.5 40.6687 87.9688C42.5437 90.6875 44.5125 91.9063 46.8562 91.9063C49.2 91.9063 50.7 91.0625 52.8562 88.9063C54.45 87.3125 55.6687 85.9063 56.7937 84.9688Z"/></svg>
+      </a>
+    </nav>
+  </header>
+
+  <main class="page">
+    <article class="doc">
+      <h1>privacy</h1>
+      <p class="lead">prothesmia keeps only what it needs to show a countdown. no accounts, no ads, no tracking, nothing sold.</p>
+
+      <h2>discord bot</h2>
+      <p>for each countdown you set, it stores:</p>
+      <ul>
+        <li>the server id and channel id</li>
+        <li>the label, date, optional start date, tag and timezone</li>
+        <li>the fields, card size, ring style, update-interval and post-schedule</li>
+        <li>an image url, if you set a thumbnail</li>
+        <li>when the card was last refreshed</li>
+      </ul>
+      <p>it only receives the slash commands people use. it can't read messages or member lists, and uses no privileged intents. the data sits in a database hosted on turso, and the bot runs on render. error logs there can include a server id.</p>
+      <p>if you set a thumbnail, discord fetches that image url and serves it through its own proxy.</p>
+
+      <h2>reddit app</h2>
+      <p>the settings you give it (events, timezone, ring style and so on) are read from the community's app settings. it keeps two small values in reddit's own app storage: the date of the last scheduled thread, and that thread's post id. it posts and pins as its own account.</p>
+      <p>it doesn't store anything about the people who view or comment on its posts.</p>
+
+      <h2>this website</h2>
+      <p>no cookies, no analytics. the fonts load from google fonts, so google can see your ip address when a page loads.</p>
+
+      <h2>removing your data</h2>
+      <p>on discord, <code>/countdown remove</code> deletes a countdown and its card. to have everything for a server deleted, ask me. on reddit, uninstalling the app stops all posting.</p>
+
+      <h2>changes</h2>
+      <p>if this changes, it changes here, with the date below.</p>
+
+      <h2>contact</h2>
+      <p>open an issue on <a href="https://github.com/nielandvoid/prothesmia/issues" target="_blank" rel="noopener noreferrer">github</a>, or mail me at <a href="mailto:hey@nielandvoid.com">hey@nielandvoid.com</a>.</p>
+
+      <p class="meta">last updated 06 nov 2026</p>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <span>προθεσμία</span>
+    <nav>
+      <a href="/terms/">terms</a>
+      <a href="https://nielandvoid.com" target="_blank" rel="noopener noreferrer">niel</a>
+      <a href="https://github.com/nielandvoid/prothesmia" target="_blank" rel="noopener noreferrer">github</a>
+    </nav>
+  </footer>
+</body>
+</html>

@@ -33,12 +33,21 @@
       </a>
     </nav>
   </header>
-  <a class="icon-btn klepsydra-link" href="https://klepsydra.xyz" target="_blank" rel="noopener noreferrer" data-tip="klepsydra">
-    <span class="dot"></span>
-    <span class="klepsydra-name">κλεψύδρα</span>
-  </a>
+  <div class="corner">
+    <a class="icon-btn klepsydra-link" href="https://klepsydra.xyz" target="_blank" rel="noopener noreferrer" data-tip="klepsydra">
+      <span class="dot"></span>
+      <span class="klepsydra-name">κλεψύδρα</span>
+    </a>
+    <a class="icon-btn" href="https://github.com/nielandvoid/oasis" target="_blank" rel="noopener noreferrer" data-tip="oasis" aria-label="oasis">
+      <img src="buttons/oasis.png" width="38" height="38" alt="">
+    </a>
+    <a class="icon-btn" href="https://github.com/nielandvoid/okite" target="_blank" rel="noopener noreferrer" data-tip="okite" aria-label="okite">
+      <img src="buttons/okite.png" width="38" height="38" alt="">
+    </a>
+  </div>
 
   <main class="page">
+    <svg class="links" aria-hidden="true"><path/><path/><path/><path/><path/><path/></svg>
     <section class="intro">
       <h1>simple<br>countdown embeds</h1>
       <p>a dumb-simple discord bot to embed countdowns for events / exams in read-only discord channels. embeds are dynamic - 1h (min) to 24h.</p>
@@ -47,6 +56,7 @@
         <a class="btn" href="#preview">preview</a>
         <a class="btn" href="#setup">setup</a>
         <a class="btn" href="#commands">commands</a>
+        <a class="btn" href="#reddit">reddit</a>
         <a class="btn" href="https://github.com/nielandvoid/prothesmia" target="_blank" rel="noopener noreferrer">src</a>
         <ul class="perms">
           <li><code>view channels</code></li>
@@ -55,6 +65,8 @@
           <li><code>attach files</code></li>
           <li><code>read message history</code></li>
         </ul>
+        <span class="reddit-branch" aria-hidden="true"></span>
+        <a class="btn primary reddit-cta" href="https://developers.reddit.com/apps/prothesmia" target="_blank" rel="noopener noreferrer">add to subreddit (waiting approval)</a>
       </div>
     </section>
 
@@ -146,6 +158,8 @@
         <li><code>interval</code><span>hours between updates, <code>1</code> to <code>24</code>; defaults to <code>1</code></span></li>
         <li><code>schedule</code><span><code>now</code> / <code>start</code> / <code>custom</code></span></li>
         <li><code>post_at</code><span>the post time for a custom schedule; before the date</span></li>
+        <li><code>bump</code><span>on or off; a short message that deletes itself after 5 seconds, to wake the channel</span></li>
+        <li><code>bump-interval</code><span>hours between bumps, <code>1</code> to <code>168</code>; defaults to <code>24</code></span></li>
       </ul>
     </section>
 
@@ -164,15 +178,49 @@
         uses no privileged intents.
       </p>
     </section>
+
+    <section class="block" id="reddit">
+      <div class="pane-tag">reddit</div>
+      <div class="steps">
+        <p>almost similar to the discord card visually. any mod with <code>everything</code> privileges can add it to their community.</p>
+        <p>in the subreddit's mod menu, select <code>create countdown post</code></p>
+        <p>self-pins in the first slot. set custom config through community's installed apps' settings: <code>developers.reddit.com/r/community/apps/prothesmia</code> - post updates accordingly.</p>
+      </div>
+      <div class="actions">
+        <a class="btn primary" href="https://developers.reddit.com/apps/prothesmia" target="_blank" rel="noopener noreferrer">add to subreddit (waiting approval)</a>
+      </div>
+    </section>
+
+    <section class="block" id="reddit-settings">
+      <h2 class="block-tag">reddit settings</h2>
+      <ul class="rows">
+        <li><code>events</code><span>written like <code>name | event date | countdown start</code>, separated by <code>;</code>; the start is optional</span></li>
+        <li><code>timezone</code><span>an IANA name such as <code>Asia/Kolkata</code></span></li>
+        <li><code>ring style</code><span><code>default</code> / <code>pride</code> / <code>trans</code></span></li>
+        <li><code>card size</code><span><code>tall</code> by default, or <code>compact</code>; <code>desktop</code> is for wide screens</span></li>
+        <li><code>fields</code><span>beside the ring: <code>target</code>, <code>time left</code>, <code>elapsed</code>, or deselect all for just the ring</span></li>
+        <li><code>tag</code><span>small text in the top corner, <code>none</code> to hide</span></li>
+        <li><code>live clock</code><span>days, hours, minutes and seconds under a smaller ring</span></li>
+        <li><code>countdown post title</code><span>used when a mod creates the post</span></li>
+        <li><code>scheduled thread</code><span>an optional thread at a set hour, with the days left in the title</span></li>
+      </ul>
+    </section>
   </main>
 
   <footer class="footer">
     <span>προθεσμία</span>
     <nav>
+      <a href="/terms/">terms</a>
+      <a href="/privacy/">privacy</a>
       <a href="https://nielandvoid.com" target="_blank" rel="noopener noreferrer">niel</a>
       <a href="https://github.com/nielandvoid/prothesmia" target="_blank" rel="noopener noreferrer">github</a>
       <a href="https://klepsydra.xyz" target="_blank" rel="noopener noreferrer">κλεψύδρα</a>
     </nav>
+    <div class="buttons">
+      <a href="https://nielandvoid.com" target="_blank" rel="noopener noreferrer"><img src="buttons/niel.png" width="88" height="31" alt="niel"></a>
+      <a href="https://peerproject.in" target="_blank" rel="noopener noreferrer"><img src="buttons/tpp.png" width="88" height="31" alt="the peer project"></a>
+      <img src="buttons/raido.gif" width="88" height="31" alt="raido">
+    </div>
   </footer>
 
   <script src="script.js"></script>
