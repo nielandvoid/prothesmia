@@ -2,6 +2,7 @@
   "name": "prothesmia",
   "version": "0.2.0",
   "private": true,
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "start": "node --env-file-if-exists=.env src/server.js",

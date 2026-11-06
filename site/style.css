@@ -990,7 +990,7 @@ code {
   }
 }
 
-@media (max-width: 880px) {
+@media (max-width: 720px) {
   .reddit-branch,
   .reddit-cta {
     display: none;
