@@ -250,12 +250,12 @@ body {
 }
 
 .card-foot {
-  --fontsize: 24;
+  --fontsize: 19;
   position: absolute;
   right: calc(var(--pad) * var(--unit));
   top: calc((var(--foot-y) - var(--fontsize) / 2) * var(--unit));
   line-height: 1;
-  color: var(--muted);
+  color: color-mix(in srgb, var(--muted) 72%, transparent);
 }
 
 .card-message {
@@ -295,6 +295,6 @@ body {
   }
 
   .card-foot {
-    --fontsize: 36;
+    --fontsize: 27;
   }
 }
