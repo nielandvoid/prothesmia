@@ -53,6 +53,7 @@ npm run build
 ```
 
 changelog
+- 0.0.10 - minimized footer
 - 0.0.7 - add `"marketingAssets": { "icon": "assets/icon.png" }`
 - 0.0.6 - approved for the public listing
 - 0.0.5 - first version on reddit
