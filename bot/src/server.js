@@ -79,10 +79,10 @@ function send(res, status, payload) {
 }
 
 const server = createServer(async (req, res) => {
-  if (req.method === "GET" && req.url === "/health") {
+  if ((req.method === "GET" || req.method === "HEAD") && req.url === "/health") {
     refreshIfDue();
     res.writeHead(200, { "Content-Type": "text/plain" });
-    res.end("ok");
+    res.end(req.method === "HEAD" ? undefined : "ok");
     return;
   }
 
